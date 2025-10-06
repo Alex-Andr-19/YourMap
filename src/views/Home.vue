@@ -15,6 +15,7 @@ import Stroke from "ol/style/Stroke";
 import CircleStyle from "ol/style/Circle.js";
 import { Cluster, XYZ } from "ol/source";
 import Text from "ol/style/Text";
+import GeoJSON from "ol/format/GeoJSON";
 
 /**
  * longitude, latitude
@@ -38,22 +39,33 @@ const myStyle = new Style({
     }),
 });
 
-function randNumberWithBorders(left: number, right: number): number {
-    const percent = Math.random();
-    return left + percent * (right - left);
+function randNumberWithBorders(min: number, max: number): number {
+    return min + Math.random() * (max - min);
 }
 
-function generatePoints(count: number = 50): CoordinateType[] {
-    const res: CoordinateType[] = [];
+function generateGeoJSON(count: number = 50): GeoJSON.FeatureCollection {
+    const features: GeoJSON.Feature[] = [];
 
     for (let i = 0; i < count; i++) {
         const long = randNumberWithBorders(firstPoint[0], secondPoint[0]);
         const lat = randNumberWithBorders(firstPoint[1], secondPoint[1]);
 
-        res.push([long, lat]);
+        features.push({
+            type: "Feature",
+            geometry: {
+                type: "Point",
+                coordinates: [long, lat],
+            },
+            properties: {
+                id: i,
+            },
+        });
     }
 
-    return res;
+    return {
+        type: "FeatureCollection",
+        features,
+    };
 }
 
 const styleCache: Record<number, Style> = {};
@@ -64,28 +76,19 @@ function createMap() {
     const baseLayer = new TileLayer({
         source: new OSM(),
     });
-    // const baseLayer = new TileLayer({
-    //     source: new XYZ({
-    //         url: "https://{a-c}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-    //         attributions: '&copy; <a href="https://carto.com/">CARTO</a>',
-    //     }),
-    // });
 
-    const point1 = new Feature(new Point(firstPoint));
-    const point2 = new Feature(new Point(secondPoint));
-
-    const points: Feature[] = [];
-    const pointsCoords = generatePoints(200);
-    for (let el of pointsCoords) {
-        points.push(new Feature(new Point(el)));
-        // points[points.length - 1]?.setStyle(myStyle);
-    }
-
+    const geojson = generateGeoJSON(200);
     const dataLayer = new VectorLayer({
         // source: new VectorSource({ features: [point1, point2, ...points] }),
         source: new Cluster({
             distance: 10,
-            source: new VectorSource({ features: [point1, point2, ...points] }),
+            // source: new VectorSource({ features: [point1, point2, ...points] }),
+            // source: new VectorSource(generateGeoJSON()),
+            source: new VectorSource({
+                features: new GeoJSON().readFeatures(geojson, {
+                    featureProjection: "EPSG:4326", // если используешь useGeographic()
+                }),
+            }),
         }),
         style: function (feature) {
             const size = feature.get("features").length;
