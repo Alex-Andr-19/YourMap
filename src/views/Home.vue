@@ -13,7 +13,8 @@ import Style from "ol/style/Style";
 import Fill from "ol/style/Fill";
 import Stroke from "ol/style/Stroke";
 import CircleStyle from "ol/style/Circle.js";
-import { XYZ } from "ol/source";
+import { Cluster, XYZ } from "ol/source";
+import Text from "ol/style/Text";
 
 /**
  * longitude, latitude
@@ -55,6 +56,8 @@ function generatePoints(count: number = 50): CoordinateType[] {
     return res;
 }
 
+const styleCache: Record<number, Style> = {};
+
 function createMap() {
     useGeographic();
 
@@ -72,14 +75,43 @@ function createMap() {
     const point2 = new Feature(new Point(secondPoint));
 
     const points: Feature[] = [];
-    const pointsCoords = generatePoints(1000);
+    const pointsCoords = generatePoints(200);
     for (let el of pointsCoords) {
         points.push(new Feature(new Point(el)));
-        points[points.length - 1]?.setStyle(myStyle);
+        // points[points.length - 1]?.setStyle(myStyle);
     }
 
     const dataLayer = new VectorLayer({
-        source: new VectorSource({ features: [point1, point2, ...points] }),
+        // source: new VectorSource({ features: [point1, point2, ...points] }),
+        source: new Cluster({
+            distance: 10,
+            source: new VectorSource({ features: [point1, point2, ...points] }),
+        }),
+        style: function (feature) {
+            const size = feature.get("features").length;
+            let style = styleCache[size];
+            if (!style) {
+                style = new Style({
+                    image: new CircleStyle({
+                        radius: 10,
+                        stroke: new Stroke({
+                            color: "#fff",
+                        }),
+                        fill: new Fill({
+                            color: "#3399CC",
+                        }),
+                    }),
+                    text: new Text({
+                        text: size.toString(),
+                        fill: new Fill({
+                            color: "#fff",
+                        }),
+                    }),
+                });
+                styleCache[size] = style;
+            }
+            return style;
+        },
     });
 
     // baseLayer.on("prerender", () => {
