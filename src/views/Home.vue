@@ -38,8 +38,6 @@ const localStyleFunction: StyleLike = (feature) => {
 };
 
 function createMap() {
-    const geojson = generateGeoJSON(200);
-
     const map = new YourMap();
     map.setStyles(localStyleFunction);
     getData().then((res) => {
