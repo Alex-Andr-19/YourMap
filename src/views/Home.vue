@@ -2,6 +2,11 @@
 import { onMounted } from "vue";
 import { YourMap } from "@/helpers/YourMap";
 import { generateGeoJSON } from "@/helpers/GenerateGeoJSON";
+import CircleStyle from "ol/style/Circle";
+import Fill from "ol/style/Fill";
+import Stroke from "ol/style/Stroke";
+import Style, { type StyleLike } from "ol/style/Style";
+import Text from "ol/style/Text";
 
 function getData(): Promise<GeoJSON.FeatureCollection> {
     return new Promise((resolve, reject) => {
@@ -11,10 +16,32 @@ function getData(): Promise<GeoJSON.FeatureCollection> {
     });
 }
 
+const localStyleFunction: StyleLike = (feature) => {
+    const size = feature.get("features").length;
+    return new Style({
+        image: new CircleStyle({
+            radius: 10,
+            stroke: new Stroke({
+                color: "#ff0",
+            }),
+            fill: new Fill({
+                color: "#339900",
+            }),
+        }),
+        text: new Text({
+            text: size.toString(),
+            fill: new Fill({
+                color: "#fff",
+            }),
+        }),
+    });
+};
+
 function createMap() {
     const geojson = generateGeoJSON(200);
 
     const map = new YourMap();
+    map.setStyles(localStyleFunction);
     getData().then((res) => {
         map.setData(res);
     });

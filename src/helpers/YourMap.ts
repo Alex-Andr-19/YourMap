@@ -7,12 +7,10 @@ import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import Cluster from "ol/source/Cluster";
 import OSM from "ol/source/OSM";
-import Style from "ol/style/Style";
-import CircleStyle from "ol/style/Circle";
-import Stroke from "ol/style/Stroke";
-import Fill from "ol/style/Fill";
-import Text from "ol/style/Text";
-// import { Coordinate } from 'ol/coordinate';
+import Style, { type StyleFunction, type StyleLike } from "ol/style/Style";
+import { DEFAULT_STYLES } from "./MapConstants";
+import type { FlatStyleLike } from "ol/style/flat";
+import type { FeatureLike } from "ol/Feature";
 
 /**
  * longitude, latitude
@@ -32,31 +30,7 @@ export class YourMap {
             distance: 10,
             source: new VectorSource(), // Инициализируем пустым источником
         }),
-        style: (feature) => {
-            const size = feature.get("features").length;
-            let style = this.styleCache[size];
-            if (!style) {
-                style = new Style({
-                    image: new CircleStyle({
-                        radius: 10,
-                        stroke: new Stroke({
-                            color: "#fff",
-                        }),
-                        fill: new Fill({
-                            color: "#3399CC",
-                        }),
-                    }),
-                    text: new Text({
-                        text: size.toString(),
-                        fill: new Fill({
-                            color: "#fff",
-                        }),
-                    }),
-                });
-                this.styleCache[size] = style;
-            }
-            return style;
-        },
+        style: DEFAULT_STYLES,
     });
 
     map: Map | null = null;
@@ -100,9 +74,7 @@ export class YourMap {
     // Метод для установки/обновления данных
     setData(data: GeoJSON.FeatureCollection) {
         const format = new GeoJSON();
-        const features = format.readFeatures(data, {
-            featureProjection: "EPSG:4326",
-        });
+        const features = format.readFeatures(data);
 
         // Получаем кластерный источник и его внутренний векторный источник
         const clusterSource = this.dataLayer.getSource();
@@ -114,6 +86,11 @@ export class YourMap {
                 vectorSource.addFeatures(features);
             }
         }
+    }
+
+    // setStyles(styleFunction: StyleFunction) {
+    setStyles(styleFunction: StyleLike) {
+        this.dataLayer.setStyle(styleFunction);
     }
 
     // Дополнительные методы для работы с данными
@@ -128,9 +105,7 @@ export class YourMap {
     // Метод для добавления данных без очистки существующих
     addData(data: GeoJSON.FeatureCollection) {
         const format = new GeoJSON();
-        const features = format.readFeatures(data, {
-            featureProjection: "EPSG:3857",
-        });
+        const features = format.readFeatures(data);
 
         const clusterSource = this.dataLayer.getSource();
         if (clusterSource) {
