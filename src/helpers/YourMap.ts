@@ -14,6 +14,7 @@ import { click } from "ol/events/condition";
 import { Collection, type Feature } from "ol";
 import { YourMapDataProcessing } from "./YourMapDataProcessing";
 import { YourMapStyling } from "./YourMapStyling";
+import { YourMapInteraction } from "./YourMapInteraction";
 
 /**
  * longitude, latitude
@@ -38,6 +39,13 @@ export type YourMapOptions = {
 
 export type YourMapProvideObjType = {
     dataLayer: VectorLayer<Cluster<Feature>>;
+    olMap: Map | null;
+};
+
+export type YourMapInterfaces = {
+    data?: YourMapDataProcessing;
+    style?: YourMapStyling;
+    interaction?: YourMapInteraction;
 };
 
 export class YourMap {
@@ -53,22 +61,17 @@ export class YourMap {
         style: DEFAULT_STYLES,
     });
 
+    olMap: Map | null;
+
     private provideObj: YourMapProvideObjType = {
         dataLayer: this.dataLayer,
+        olMap: null,
     };
 
-    data: YourMapDataProcessing = new YourMapDataProcessing(this.provideObj);
-    style: YourMapStyling = new YourMapStyling(this.provideObj);
+    private interfaces: YourMapInterfaces = {};
 
-    olMap: Map | null = null;
     center: CoordinateType = [44.002, 56.3287];
     zoom: number = 11;
-
-    select = new Select({
-        condition: click,
-        layers: [this.dataLayer],
-    });
-    selectedFeatures: Collection<Feature> = new Collection();
 
     constructor(options: YourMapOptions) {
         useGeographic();
@@ -100,30 +103,43 @@ export class YourMap {
             }),
         });
 
-        this.configureSelectedFeatures(_options.interactionHandler);
+        this.provideObj.olMap = this.olMap;
+        this.generateInterfaces();
+
+        if (this.interfaces.interaction !== undefined)
+            this.interfaces.interaction.configureSelectedFeatures(_options.interactionHandler);
 
         // Преобразуем GeoJSON в features и добавляем в dataLayer
-        if (_options.data) {
-            this.data.setData(_options.data);
-        }
+        if (_options.data && this.interfaces.data) this.interfaces.data.setData(_options.data);
     }
 
-    private configureSelectedFeatures(interactionHandler?: InteractionFunctionType) {
-        this.olMap!.addInteraction(this.select);
-        this.selectedFeatures = this.select.getFeatures();
+    private generateInterfaces() {
+        this.interfaces.data = new YourMapDataProcessing(this.provideObj);
+        this.interfaces.style = new YourMapStyling(this.provideObj);
+        this.interfaces.interaction = new YourMapInteraction(this.provideObj);
+    }
 
-        this.selectedFeatures.on("add", (e) => {
-            const feature = e.element;
-            const clusterFeatures = feature.get("features") as Feature[];
-            const clusterFeaturesProperties = clusterFeatures.map((el) => el.getProperties());
-            if (interactionHandler) {
-                interactionHandler(clusterFeaturesProperties);
-            }
-        });
+    /** ===============================================
+     **               interfaces.data                **
+     * ============================================= */
 
-        this.selectedFeatures.on("remove", (e) => {
-            const feature = e.element;
-            console.log(feature);
-        });
+    setData(data: GeoJSON.FeatureCollection) {
+        this.interfaces.data?.setData(data);
+    }
+
+    clearData() {
+        this.interfaces.data?.clearData();
+    }
+
+    addData(data: GeoJSON.FeatureCollection) {
+        this.interfaces.data?.addData(data);
+    }
+
+    /** ===============================================
+     **              interfaces.style                **
+     * ============================================= */
+
+    setStyles(styleFunction: StyleLike) {
+        this.interfaces.style?.setStyles(styleFunction);
     }
 }
