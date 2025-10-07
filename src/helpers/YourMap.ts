@@ -12,6 +12,7 @@ import { DEFAULT_CONSTRUCTOR_OPTIONS, DEFAULT_STYLES } from "./MapConstants";
 import Select from "ol/interaction/Select";
 import { click } from "ol/events/condition";
 import { Collection, type Feature } from "ol";
+import { YourMapDataProcessing } from "./YourMapDataProcessing";
 
 /**
  * longitude, latitude
@@ -46,6 +47,8 @@ export class YourMap {
         }),
         style: DEFAULT_STYLES,
     });
+
+    dataProcessor: YourMapDataProcessing = new YourMapDataProcessing(this.dataLayer);
 
     map: Map | null = null;
     center: CoordinateType = [44.002, 56.3287];
@@ -91,7 +94,7 @@ export class YourMap {
 
         // Преобразуем GeoJSON в features и добавляем в dataLayer
         if (_options.data) {
-            this.setData(_options.data);
+            this.dataProcessor.setData(_options.data);
         }
     }
 
@@ -114,45 +117,7 @@ export class YourMap {
         });
     }
 
-    // Метод для установки/обновления данных
-    setData(data: GeoJSON.FeatureCollection) {
-        const format = new GeoJSON();
-        const features = format.readFeatures(data);
-
-        // Получаем кластерный источник и его внутренний векторный источник
-        const clusterSource = this.dataLayer.getSource();
-        if (clusterSource) {
-            const vectorSource = clusterSource.getSource();
-            if (vectorSource) {
-                // Очищаем старые features и добавляем новые
-                vectorSource.clear();
-                vectorSource.addFeatures(features);
-            }
-        }
-    }
-
     setStyles(styleFunction: StyleLike) {
         this.dataLayer.setStyle(styleFunction);
-    }
-
-    // Дополнительные методы для работы с данными
-    clearData() {
-        const clusterSource = this.dataLayer.getSource();
-        if (clusterSource) {
-            const vectorSource = clusterSource.getSource();
-            vectorSource?.clear();
-        }
-    }
-
-    // Метод для добавления данных без очистки существующих
-    addData(data: GeoJSON.FeatureCollection) {
-        const format = new GeoJSON();
-        const features = format.readFeatures(data);
-
-        const clusterSource = this.dataLayer.getSource();
-        if (clusterSource) {
-            const vectorSource = clusterSource.getSource();
-            vectorSource?.addFeatures(features);
-        }
     }
 }

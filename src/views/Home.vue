@@ -37,15 +37,16 @@ const localStyleFunction: StyleLike = (feature) => {
     });
 };
 
+let map: YourMap;
 function createMap() {
-    const map = new YourMap({
+    map = new YourMap({
         interactionHandler: (features) => {
             console.log(features);
         },
     });
     map.setStyles(localStyleFunction);
     getData().then((res) => {
-        map.setData(res);
+        map.dataProcessor.setData(res);
     });
 }
 
