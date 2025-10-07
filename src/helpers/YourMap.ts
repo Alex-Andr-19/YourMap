@@ -131,7 +131,6 @@ export class YourMap {
         }
     }
 
-    // setStyles(styleFunction: StyleFunction) {
     setStyles(styleFunction: StyleLike) {
         this.dataLayer.setStyle(styleFunction);
     }
