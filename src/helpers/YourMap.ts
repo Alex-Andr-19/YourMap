@@ -25,6 +25,9 @@ export type CoordinateType = [number, number];
  */
 export type InteractionFunctionType = (features: ReturnType<Feature["getProperties"]>[]) => void;
 
+/**
+ * Configuration to constructor of YourMap class
+ */
 export type YourMapOptions = {
     data?: GeoJSON.FeatureCollection;
     darkTheme?: boolean;
@@ -108,8 +111,6 @@ export class YourMap {
         this.selectedFeatures.on("remove", (e) => {
             const feature = e.element;
             console.log(feature);
-            // console.log(feature.get);
-            // feature.setStyle(defaultStyle);
         });
     }
 
