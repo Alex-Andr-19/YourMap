@@ -49,7 +49,7 @@ export class YourMap {
         style: DEFAULT_STYLES,
     });
 
-    dataProcessor: YourMapDataProcessing = new YourMapDataProcessing(this.dataLayer);
+    data: YourMapDataProcessing = new YourMapDataProcessing(this.dataLayer);
     style: YourMapStyling = new YourMapStyling(this.dataLayer);
 
     map: Map | null = null;
@@ -96,7 +96,7 @@ export class YourMap {
 
         // Преобразуем GeoJSON в features и добавляем в dataLayer
         if (_options.data) {
-            this.dataProcessor.setData(_options.data);
+            this.data.setData(_options.data);
         }
     }
 

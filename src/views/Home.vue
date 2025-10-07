@@ -46,7 +46,7 @@ function createMap() {
     });
     map.style.setStyles(localStyleFunction);
     getData().then((res) => {
-        map.dataProcessor.setData(res);
+        map.data.setData(res);
     });
 }
 
