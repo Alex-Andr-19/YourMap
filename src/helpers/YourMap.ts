@@ -7,10 +7,11 @@ import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import Cluster from "ol/source/Cluster";
 import OSM from "ol/source/OSM";
-import Style, { type StyleFunction, type StyleLike } from "ol/style/Style";
-import { DEFAULT_STYLES } from "./MapConstants";
-import type { FlatStyleLike } from "ol/style/flat";
-import type { FeatureLike } from "ol/Feature";
+import { type StyleLike } from "ol/style/Style";
+import { DEFAULT_CONSTRUCTOR_OPTIONS, DEFAULT_STYLES } from "./MapConstants";
+import Select from "ol/interaction/Select";
+import { click } from "ol/events/condition";
+import { Collection, type Feature } from "ol";
 
 /**
  * longitude, latitude
@@ -19,15 +20,25 @@ import type { FeatureLike } from "ol/Feature";
  */
 export type CoordinateType = [number, number];
 
+/**
+ * Function for handle click on cluster features
+ */
+export type InteractionFunctionType = (features: ReturnType<Feature["getProperties"]>[]) => void;
+
+export type YourMapOptions = {
+    data?: GeoJSON.FeatureCollection;
+    darkTheme?: boolean;
+    interactionHandler?: InteractionFunctionType;
+};
+
 export class YourMap {
-    private styleCache: Record<number, Style> = {};
     private baseLayer = new TileLayer({
         source: new OSM(),
     });
 
     dataLayer = new VectorLayer({
         source: new Cluster({
-            distance: 10,
+            distance: 15,
             source: new VectorSource(), // Инициализируем пустым источником
         }),
         style: DEFAULT_STYLES,
@@ -37,10 +48,18 @@ export class YourMap {
     center: CoordinateType = [44.002, 56.3287];
     zoom: number = 11;
 
-    constructor(data?: GeoJSON.FeatureCollection, darkTheme: boolean = true) {
+    select = new Select({
+        condition: click,
+        layers: [this.dataLayer],
+    });
+    selectedFeatures: Collection<Feature> = new Collection();
+
+    constructor(options: YourMapOptions) {
         useGeographic();
 
-        if (darkTheme) {
+        const _options = { ...DEFAULT_CONSTRUCTOR_OPTIONS, ...options };
+
+        if (_options.darkTheme) {
             this.baseLayer.on("prerender", (evt) => {
                 if (evt.context) {
                     const context = evt.context as CanvasRenderingContext2D;
@@ -65,10 +84,33 @@ export class YourMap {
             }),
         });
 
+        this.configureSelectedFeatures(_options.interactionHandler);
+
         // Преобразуем GeoJSON в features и добавляем в dataLayer
-        if (data) {
-            this.setData(data);
+        if (_options.data) {
+            this.setData(_options.data);
         }
+    }
+
+    private configureSelectedFeatures(interactionHandler?: InteractionFunctionType) {
+        this.map!.addInteraction(this.select);
+        this.selectedFeatures = this.select.getFeatures();
+
+        this.selectedFeatures.on("add", (e) => {
+            const feature = e.element;
+            const clusterFeatures = feature.get("features") as Feature[];
+            const clusterFeaturesProperties = clusterFeatures.map((el) => el.getProperties());
+            if (interactionHandler) {
+                interactionHandler(clusterFeaturesProperties);
+            }
+        });
+
+        this.selectedFeatures.on("remove", (e) => {
+            const feature = e.element;
+            console.log(feature);
+            // console.log(feature.get);
+            // feature.setStyle(defaultStyle);
+        });
     }
 
     // Метод для установки/обновления данных

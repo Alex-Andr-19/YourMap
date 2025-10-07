@@ -4,6 +4,7 @@ import Fill from "ol/style/Fill";
 import Stroke from "ol/style/Stroke";
 import Style, { type StyleFunction, type StyleLike } from "ol/style/Style";
 import Text from "ol/style/Text";
+import type { YourMapOptions } from "./YourMap";
 
 export const DEFAULT_STYLES: StyleLike = (feature) => {
     const size = feature.get("features").length;
@@ -24,4 +25,8 @@ export const DEFAULT_STYLES: StyleLike = (feature) => {
             }),
         }),
     });
+};
+
+export const DEFAULT_CONSTRUCTOR_OPTIONS: YourMapOptions = {
+    darkTheme: true,
 };

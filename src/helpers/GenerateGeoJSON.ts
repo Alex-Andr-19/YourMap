@@ -23,6 +23,7 @@ export function generateGeoJSON(count: number = 50): GeoJSON.FeatureCollection {
         const long = randNumberWithBorders(firstPoint[0], secondPoint[0]);
         const lat = randNumberWithBorders(firstPoint[1], secondPoint[1]);
 
+        const statusRandIndex = Math.floor(randNumberWithBorders(0, statuses.length));
         features.push({
             type: "Feature",
             geometry: {
@@ -31,7 +32,7 @@ export function generateGeoJSON(count: number = 50): GeoJSON.FeatureCollection {
             },
             properties: {
                 id: i,
-                status: statuses[Math.ceil(randNumberWithBorders(0, statuses.length + 1))],
+                status: statuses[statusRandIndex],
             },
         });
     }

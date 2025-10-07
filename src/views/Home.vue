@@ -12,7 +12,7 @@ function getData(): Promise<GeoJSON.FeatureCollection> {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
             resolve(generateGeoJSON(200));
-        }, 2000);
+        }, 1000);
     });
 }
 
@@ -38,7 +38,11 @@ const localStyleFunction: StyleLike = (feature) => {
 };
 
 function createMap() {
-    const map = new YourMap();
+    const map = new YourMap({
+        interactionHandler: (features) => {
+            console.log(features);
+        },
+    });
     map.setStyles(localStyleFunction);
     getData().then((res) => {
         map.setData(res);
