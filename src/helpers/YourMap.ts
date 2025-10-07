@@ -13,6 +13,7 @@ import Select from "ol/interaction/Select";
 import { click } from "ol/events/condition";
 import { Collection, type Feature } from "ol";
 import { YourMapDataProcessing } from "./YourMapDataProcessing";
+import { YourMapStyling } from "./YourMapStyling";
 
 /**
  * longitude, latitude
@@ -49,6 +50,7 @@ export class YourMap {
     });
 
     dataProcessor: YourMapDataProcessing = new YourMapDataProcessing(this.dataLayer);
+    style: YourMapStyling = new YourMapStyling(this.dataLayer);
 
     map: Map | null = null;
     center: CoordinateType = [44.002, 56.3287];
@@ -115,9 +117,5 @@ export class YourMap {
             const feature = e.element;
             console.log(feature);
         });
-    }
-
-    setStyles(styleFunction: StyleLike) {
-        this.dataLayer.setStyle(styleFunction);
     }
 }

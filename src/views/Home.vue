@@ -44,7 +44,7 @@ function createMap() {
             console.log(features);
         },
     });
-    map.setStyles(localStyleFunction);
+    map.style.setStyles(localStyleFunction);
     getData().then((res) => {
         map.dataProcessor.setData(res);
     });
