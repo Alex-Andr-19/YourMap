@@ -103,7 +103,7 @@ export class YourMap {
             }),
         });
 
-        this.provideObj.olMap = this.olMap;
+        this.generateProvideObj();
         this.generateInterfaces();
 
         if (this.interfaces.interaction !== undefined)
