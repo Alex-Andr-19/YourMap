@@ -113,6 +113,10 @@ export class YourMap {
         if (_options.data && this.interfaces.data) this.interfaces.data.setData(_options.data);
     }
 
+    private generateProvideObj() {
+        this.provideObj.olMap = this.olMap;
+    }
+
     private generateInterfaces() {
         this.interfaces.data = new YourMapDataProcessing(this.provideObj);
         this.interfaces.style = new YourMapStyling(this.provideObj);
