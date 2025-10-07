@@ -56,7 +56,7 @@ onMounted(() => {
 
 <template>
     <div class="map-container debug-indicator">
-        <h2>map-container</h2>
+        <h2 class="map-container__header">map-container</h2>
 
         <div id="map"></div>
     </div>
