@@ -52,7 +52,7 @@ export class YourMap {
     data: YourMapDataProcessing = new YourMapDataProcessing(this.dataLayer);
     style: YourMapStyling = new YourMapStyling(this.dataLayer);
 
-    map: Map | null = null;
+    olMap: Map | null = null;
     center: CoordinateType = [44.002, 56.3287];
     zoom: number = 11;
 
@@ -83,7 +83,7 @@ export class YourMap {
             });
         }
 
-        this.map = new Map({
+        this.olMap = new Map({
             target: "map",
             layers: [this.baseLayer, this.dataLayer],
             view: new View({
@@ -101,7 +101,7 @@ export class YourMap {
     }
 
     private configureSelectedFeatures(interactionHandler?: InteractionFunctionType) {
-        this.map!.addInteraction(this.select);
+        this.olMap!.addInteraction(this.select);
         this.selectedFeatures = this.select.getFeatures();
 
         this.selectedFeatures.on("add", (e) => {
