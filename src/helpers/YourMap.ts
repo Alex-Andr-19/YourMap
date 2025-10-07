@@ -36,6 +36,10 @@ export type YourMapOptions = {
     interactionHandler?: InteractionFunctionType;
 };
 
+export type YourMapProvideObjType = {
+    dataLayer: VectorLayer<Cluster<Feature>>;
+};
+
 export class YourMap {
     private baseLayer = new TileLayer({
         source: new OSM(),
@@ -49,8 +53,12 @@ export class YourMap {
         style: DEFAULT_STYLES,
     });
 
-    data: YourMapDataProcessing = new YourMapDataProcessing(this.dataLayer);
-    style: YourMapStyling = new YourMapStyling(this.dataLayer);
+    private provideObj: YourMapProvideObjType = {
+        dataLayer: this.dataLayer,
+    };
+
+    data: YourMapDataProcessing = new YourMapDataProcessing(this.provideObj);
+    style: YourMapStyling = new YourMapStyling(this.provideObj);
 
     olMap: Map | null = null;
     center: CoordinateType = [44.002, 56.3287];
