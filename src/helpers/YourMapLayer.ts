@@ -12,9 +12,6 @@ import type Select from "ol/interaction/Select";
 export type LayersType = VectorLayer<Cluster<Feature>> | VectorLayer;
 export type LayerOptionsType = {
     isClustering?: boolean;
-    // data: YourMapDataProcessing;
-    // style: YourMapStyling;
-    // interaction: YourMapInteraction;
 };
 
 export class YourMapLayer {
