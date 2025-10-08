@@ -17,7 +17,7 @@ function getData(): Promise<GeoJSON.FeatureCollection> {
     });
 }
 
-const localStyleFunction: StyleFunction = (feature: FeatureLike) => {
+const localStyleFunction1: StyleFunction = (feature: FeatureLike) => {
     return new Style({
         image: new CircleStyle({
             radius: 10,
@@ -41,22 +41,75 @@ const localStyleFunction: StyleFunction = (feature: FeatureLike) => {
     });
 };
 
-let map: YourMap;
-function createMap() {
-    map = new YourMap({
-        // isClustering: false,
-        interactionHandler: (features) => {
-            console.log(features);
+const localStyleFunction2: StyleFunction = (feature: FeatureLike) => {
+    return new Style({
+        image: new CircleStyle({
+            radius: 10,
+            stroke: new Stroke({
+                color: "#ff0",
+            }),
+            fill: new Fill({
+                color: "#f00",
+            }),
+        }),
+        ...(YourMap.isFeatureCluster(feature)
+            ? {
+                  text: new Text({
+                      text: feature.get("features").length.toString(),
+                      fill: new Fill({
+                          color: "#fff",
+                      }),
+                  }),
+              }
+            : {}),
+    });
+};
+
+let map_1: YourMap;
+function createMap1() {
+    map_1 = new YourMap({
+        target: "map1",
+        layers: {
+            first: {
+                interactionHandler: (features) => {
+                    console.log("Hallo, world!!!", features);
+                },
+            },
+            second: {
+                isClustering: false,
+            },
         },
     });
-    map.setStyles(localStyleFunction);
+    map_1.setStyles(localStyleFunction1, "first");
+    map_1.setStyles(localStyleFunction2, "second");
+    Promise.all([getData(), getData()]).then((res) => {
+        map_1.setData(res[0], "first");
+        setTimeout(() => {
+            map_1.setData(res[1], "second");
+        }, 1000);
+    });
+}
+
+let map_2: YourMap;
+function createMap2() {
+    map_2 = new YourMap({
+        target: "map2",
+        darkTheme: false,
+        isClustering: false,
+        interactionHandler: (features) => {
+            console.log("Here!!!", features);
+        },
+    });
+
+    map_2.setStyles(localStyleFunction1);
     getData().then((res) => {
-        map.setData(res);
+        map_2.setData(res);
     });
 }
 
 onMounted(() => {
-    createMap();
+    createMap1();
+    createMap2();
 });
 </script>
 
@@ -64,7 +117,8 @@ onMounted(() => {
     <div class="map-container debug-indicator">
         <h2 class="map-container__header">map-container</h2>
 
-        <div id="map"></div>
+        <div id="map1"></div>
+        <div id="map2"></div>
     </div>
 </template>
 

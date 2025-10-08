@@ -5,13 +5,21 @@ import { YourMapDataProcessing } from "./YourMapDataProcessing";
 import { YourMapStyling } from "./YourMapStyling";
 import { YourMapInteraction } from "./YourMapInteraction";
 import VectorSource from "ol/source/Vector";
-import { DEFAULT_STYLES } from "./MapConstants";
+import { DEFAULT_LAYER_OPTIONS, DEFAULT_STYLES } from "./MapConstants";
 import type { StyleFunction } from "ol/style/Style";
 import type Select from "ol/interaction/Select";
 
 export type LayersType = VectorLayer<Cluster<Feature>> | VectorLayer;
-export type LayerOptionsType = {
+
+/**
+ * Function for handle click on cluster features
+ */
+export type InteractionFunctionType = (features: ReturnType<Feature["getProperties"]>[]) => void;
+
+export type YourMapLayerOptionsType = {
+    data?: GeoJSON.FeatureCollection;
     isClustering?: boolean;
+    interactionHandler?: InteractionFunctionType;
 };
 
 export class YourMapLayer {
@@ -22,7 +30,7 @@ export class YourMapLayer {
     private data: YourMapDataProcessing;
     private style: YourMapStyling;
 
-    constructor(options: LayerOptionsType) {
+    constructor(options: YourMapLayerOptionsType) {
         this.olLayer = new VectorLayer({
             source: options.isClustering
                 ? new Cluster({
@@ -38,6 +46,10 @@ export class YourMapLayer {
         this.interaction = new YourMapInteraction(this.olLayer);
 
         this.select = this.interaction.select;
+
+        if (options.data) {
+            this.data.addData(options.data);
+        }
     }
 
     setData(data: GeoJSON.FeatureCollection) {
