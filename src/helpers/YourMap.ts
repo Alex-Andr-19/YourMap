@@ -56,14 +56,6 @@ export class YourMap {
         source: new OSM(),
     });
 
-    private dataLayer = new VectorLayer({
-        source: new Cluster({
-            distance: 15,
-            source: new VectorSource(), // Инициализируем пустым источником
-        }),
-        style: DEFAULT_STYLES,
-    });
-
     private layers: LayersObjType = {};
 
     olMap: Map | null;
@@ -118,12 +110,20 @@ export class YourMap {
     }
 
     private generateLayers() {
+        const dataLayer = new VectorLayer({
+            source: new Cluster({
+                distance: 15,
+                source: new VectorSource(), // Инициализируем пустым источником
+            }),
+            style: DEFAULT_STYLES,
+        });
+
         this.layers = {
             main: {
-                layer: this.dataLayer,
-                data: new YourMapDataProcessing(this.dataLayer),
-                style: new YourMapStyling(this.dataLayer),
-                interaction: new YourMapInteraction(this.dataLayer),
+                layer: dataLayer,
+                data: new YourMapDataProcessing(dataLayer),
+                style: new YourMapStyling(dataLayer),
+                interaction: new YourMapInteraction(dataLayer),
             },
         };
     }
