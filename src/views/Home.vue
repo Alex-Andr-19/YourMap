@@ -18,8 +18,6 @@ function getData(): Promise<GeoJSON.FeatureCollection> {
 }
 
 const localStyleFunction: StyleFunction = (feature: FeatureLike) => {
-    // console.log("Is cluster feature:", feature.get("features").length);
-    // const size = feature.get("features").length;
     return new Style({
         image: new CircleStyle({
             radius: 10,

@@ -6,13 +6,11 @@ import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import Cluster from "ol/source/Cluster";
 import OSM from "ol/source/OSM";
-import { type StyleFunction, type StyleLike } from "ol/style/Style";
-import { DEFAULT_CONSTRUCTOR_OPTIONS, DEFAULT_STYLES } from "./MapConstants";
+import { type StyleFunction } from "ol/style/Style";
+import { DEFAULT_CONSTRUCTOR_OPTIONS } from "./MapConstants";
 import { type Feature } from "ol";
-import { YourMapDataProcessing } from "./YourMapDataProcessing";
-import { YourMapStyling } from "./YourMapStyling";
-import { YourMapInteraction } from "./YourMapInteraction";
 import type { FeatureLike } from "ol/Feature";
+import { YourMapLayer } from "./YourMapLayer";
 
 type TaggedString<T extends string> = T | (string & {});
 
@@ -41,17 +39,7 @@ export type YourMapOptions = {
 export type LayersNamesType = TaggedString<"main">;
 export type LayersType = VectorLayer<Cluster<Feature>> | VectorLayer;
 
-type LayersObjType = Partial<
-    Record<
-        LayersNamesType,
-        {
-            layer: LayersType;
-            data: YourMapDataProcessing;
-            style: YourMapStyling;
-            interaction: YourMapInteraction;
-        }
-    >
->;
+type LayersObjType = Partial<Record<LayersNamesType, YourMapLayer>>;
 
 export class YourMap {
     private baseLayer = new TileLayer({
@@ -96,7 +84,7 @@ export class YourMap {
 
         this.olMap = new Map({
             target: "map",
-            layers: [this.baseLayer, ...Object.values(this.layers).map((el) => el!.layer)],
+            layers: [this.baseLayer, ...Object.values(this.layers).map((el) => el!.olLayer)],
             view: new View({
                 center: this.center,
                 zoom: this.zoom,
@@ -104,37 +92,20 @@ export class YourMap {
         });
 
         for (let key in this.layers) {
-            const select = this.layers[key]!.interaction.configureSelectedFeatures(
-                _options.interactionHandler,
-            );
-            this.olMap.addInteraction(select);
+            this.layers[key]!.interaction.configureSelectedFeatures(_options.interactionHandler);
+            this.olMap.addInteraction(this.layers[key]!.select);
         }
 
         // Преобразуем GeoJSON в features и добавляем в dataLayer
         if (_options.data)
             for (let key in this.layers) {
-                this.layers[key]!.data.setData(_options.data);
+                this.layers[key]!.setData(_options.data);
             }
     }
 
     private generateLayers(isClustering?: boolean) {
-        const dataLayer = new VectorLayer({
-            source: isClustering
-                ? new Cluster({
-                      distance: 15,
-                      source: new VectorSource(), // Инициализируем пустым источником
-                  })
-                : new VectorSource(),
-            style: DEFAULT_STYLES,
-        });
-
         this.layers = {
-            main: {
-                layer: dataLayer,
-                data: new YourMapDataProcessing(dataLayer),
-                style: new YourMapStyling(dataLayer),
-                interaction: new YourMapInteraction(dataLayer),
-            },
+            main: new YourMapLayer({ isClustering }),
         };
     }
 
@@ -155,15 +126,15 @@ export class YourMap {
      * ============================================= */
 
     setData(data: GeoJSON.FeatureCollection, layerName: LayersNamesType = "main") {
-        this.layers[layerName]?.data.setData(data);
+        this.layers[layerName]?.setData(data);
     }
 
     clearData(layerName: LayersNamesType = "main") {
-        this.layers[layerName]?.data.clearData();
+        this.layers[layerName]?.clearData();
     }
 
     addData(data: GeoJSON.FeatureCollection, layerName: LayersNamesType = "main") {
-        this.layers[layerName]?.data.addData(data);
+        this.layers[layerName]?.addData(data);
     }
 
     /** ===============================================
@@ -171,7 +142,7 @@ export class YourMap {
      * ============================================= */
 
     setStyles(styleFunction: StyleFunction, layerName: LayersNamesType = "main") {
-        this.layers[layerName]?.style.setStyles(styleFunction);
+        this.layers[layerName]?.setStyles(styleFunction);
     }
 
     /** ===============================================

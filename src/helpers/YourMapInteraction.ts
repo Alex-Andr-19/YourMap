@@ -5,9 +5,10 @@ import { click } from "ol/events/condition";
 import { Cluster } from "ol/source";
 
 export class YourMapInteraction {
+    select: Select;
+
     private layer: LayersType;
     private isCluster: boolean;
-    private select: Select;
     private selectedFeatures: Collection<Feature> = new Collection();
 
     constructor(layer: LayersType) {
@@ -39,7 +40,5 @@ export class YourMapInteraction {
             const feature = e.element;
             console.log(feature);
         });
-
-        return this.select;
     }
 }
