@@ -1,17 +1,18 @@
 import { Collection, type Feature } from "ol";
-import type { InteractionFunctionType } from "./YourMap";
+import type { InteractionFunctionType, LayersType } from "./YourMap";
 import Select from "ol/interaction/Select";
 import { click } from "ol/events/condition";
-import type VectorLayer from "ol/layer/Vector";
-import type { Cluster } from "ol/source";
+import { Cluster } from "ol/source";
 
 export class YourMapInteraction {
-    private layer: VectorLayer<Cluster<Feature>>;
+    private layer: LayersType;
+    private isCluster: boolean;
     private select: Select;
     private selectedFeatures: Collection<Feature> = new Collection();
 
-    constructor(layer: VectorLayer<Cluster<Feature>>) {
+    constructor(layer: LayersType) {
         this.layer = layer;
+        this.isCluster = this.layer.getSource() instanceof Cluster;
         this.select = new Select({
             condition: click,
             layers: [this.layer],
@@ -24,10 +25,13 @@ export class YourMapInteraction {
 
         this.selectedFeatures.on("add", (e) => {
             const feature = e.element;
-            const clusterFeatures = feature.get("features") as Feature[];
-            const clusterFeaturesProperties = clusterFeatures.map((el) => el.getProperties());
+            let resFeature: Feature[] = [feature];
+            if (this.isCluster) {
+                resFeature = feature.get("features") as Feature[];
+            }
+            const featuresProperties = resFeature.map((el) => el.getProperties());
             if (interactionHandler) {
-                interactionHandler(clusterFeaturesProperties);
+                interactionHandler(featuresProperties);
             }
         });
 

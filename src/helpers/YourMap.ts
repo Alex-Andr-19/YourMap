@@ -6,13 +6,13 @@ import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import Cluster from "ol/source/Cluster";
 import OSM from "ol/source/OSM";
-import { type StyleLike } from "ol/style/Style";
+import { type StyleFunction, type StyleLike } from "ol/style/Style";
 import { DEFAULT_CONSTRUCTOR_OPTIONS, DEFAULT_STYLES } from "./MapConstants";
 import { type Feature } from "ol";
 import { YourMapDataProcessing } from "./YourMapDataProcessing";
 import { YourMapStyling } from "./YourMapStyling";
 import { YourMapInteraction } from "./YourMapInteraction";
-import type BaseLayer from "ol/layer/Base";
+import type { FeatureLike } from "ol/Feature";
 
 type TaggedString<T extends string> = T | (string & {});
 
@@ -33,17 +33,19 @@ export type InteractionFunctionType = (features: ReturnType<Feature["getProperti
  */
 export type YourMapOptions = {
     data?: GeoJSON.FeatureCollection;
+    isClustering?: boolean;
     darkTheme?: boolean;
     interactionHandler?: InteractionFunctionType;
 };
 
 export type LayersNamesType = TaggedString<"main">;
+export type LayersType = VectorLayer<Cluster<Feature>> | VectorLayer;
 
 type LayersObjType = Partial<
     Record<
         LayersNamesType,
         {
-            layer: VectorLayer<Cluster<Feature>>;
+            layer: LayersType;
             data: YourMapDataProcessing;
             style: YourMapStyling;
             interaction: YourMapInteraction;
@@ -64,23 +66,29 @@ export class YourMap {
     private zoom: number = 11;
 
     constructor(options: YourMapOptions) {
-        this.generateLayers();
-
         useGeographic();
 
         const _options = { ...DEFAULT_CONSTRUCTOR_OPTIONS, ...options };
 
+        this.generateLayers(_options.isClustering);
+
         if (_options.darkTheme) {
             this.baseLayer.on("prerender", (evt) => {
                 if (evt.context) {
-                    const context = evt.context as CanvasRenderingContext2D;
+                    const canvas = evt.context.canvas;
+                    const context = canvas.getContext("2d", {
+                        willReadFrequently: true,
+                    }) as CanvasRenderingContext2D;
                     context.filter = "invert(100%) grayscale(100%) brightness(100%) contrast(125%)";
                     context.globalCompositeOperation = "source-over";
                 }
             });
             this.baseLayer.on("postrender", (evt) => {
                 if (evt.context) {
-                    const context = evt.context as CanvasRenderingContext2D;
+                    const canvas = evt.context.canvas;
+                    const context = canvas.getContext("2d", {
+                        willReadFrequently: true,
+                    }) as CanvasRenderingContext2D;
                     context.filter = "none";
                 }
             });
@@ -109,12 +117,14 @@ export class YourMap {
             }
     }
 
-    private generateLayers() {
+    private generateLayers(isClustering?: boolean) {
         const dataLayer = new VectorLayer({
-            source: new Cluster({
-                distance: 15,
-                source: new VectorSource(), // Инициализируем пустым источником
-            }),
+            source: isClustering
+                ? new Cluster({
+                      distance: 15,
+                      source: new VectorSource(), // Инициализируем пустым источником
+                  })
+                : new VectorSource(),
             style: DEFAULT_STYLES,
         });
 
@@ -160,7 +170,15 @@ export class YourMap {
      **              interfaces.style                **
      * ============================================= */
 
-    setStyles(styleFunction: StyleLike, layerName: LayersNamesType = "main") {
+    setStyles(styleFunction: StyleFunction, layerName: LayersNamesType = "main") {
         this.layers[layerName]?.style.setStyles(styleFunction);
+    }
+
+    /** ===============================================
+     **               Static methods                 **
+     * ============================================= */
+
+    static isFeatureCluster(feature: FeatureLike) {
+        return !!feature.get("features")?.length;
     }
 }

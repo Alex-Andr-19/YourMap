@@ -5,8 +5,9 @@ import { generateGeoJSON } from "@/helpers/GenerateGeoJSON";
 import CircleStyle from "ol/style/Circle";
 import Fill from "ol/style/Fill";
 import Stroke from "ol/style/Stroke";
-import Style, { type StyleLike } from "ol/style/Style";
+import Style, { type StyleFunction } from "ol/style/Style";
 import Text from "ol/style/Text";
+import type { FeatureLike } from "ol/Feature";
 
 function getData(): Promise<GeoJSON.FeatureCollection> {
     return new Promise((resolve, reject) => {
@@ -16,8 +17,9 @@ function getData(): Promise<GeoJSON.FeatureCollection> {
     });
 }
 
-const localStyleFunction: StyleLike = (feature) => {
-    const size = feature.get("features").length;
+const localStyleFunction: StyleFunction = (feature: FeatureLike) => {
+    // console.log("Is cluster feature:", feature.get("features").length);
+    // const size = feature.get("features").length;
     return new Style({
         image: new CircleStyle({
             radius: 10,
@@ -28,18 +30,23 @@ const localStyleFunction: StyleLike = (feature) => {
                 color: "#339900",
             }),
         }),
-        text: new Text({
-            text: size.toString(),
-            fill: new Fill({
-                color: "#fff",
-            }),
-        }),
+        ...(YourMap.isFeatureCluster(feature)
+            ? {
+                  text: new Text({
+                      text: feature.get("features").length.toString(),
+                      fill: new Fill({
+                          color: "#fff",
+                      }),
+                  }),
+              }
+            : {}),
     });
 };
 
 let map: YourMap;
 function createMap() {
     map = new YourMap({
+        // isClustering: false,
         interactionHandler: (features) => {
             console.log(features);
         },

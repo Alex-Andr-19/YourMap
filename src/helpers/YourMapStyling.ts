@@ -1,12 +1,10 @@
 import type { StyleLike } from "ol/style/Style";
-import type VectorLayer from "ol/layer/Vector";
-import type { Cluster } from "ol/source";
-import type { Feature } from "ol";
+import type { LayersType } from "./YourMap";
 
 export class YourMapStyling {
-    layer: VectorLayer<Cluster<Feature>>;
+    layer: LayersType;
 
-    constructor(layer: VectorLayer<Cluster<Feature>>) {
+    constructor(layer: LayersType) {
         this.layer = layer;
     }
 

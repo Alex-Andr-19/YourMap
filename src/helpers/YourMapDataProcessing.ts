@@ -1,13 +1,32 @@
 import GeoJSON from "ol/format/GeoJSON";
 import type VectorLayer from "ol/layer/Vector";
-import type { Cluster } from "ol/source";
+import { Cluster } from "ol/source";
 import type { Feature } from "ol";
+import type { LayersType } from "./YourMap";
+import type VectorSource from "ol/source/Vector";
 
 export class YourMapDataProcessing {
-    layer: VectorLayer<Cluster<Feature>>;
+    layer: LayersType;
+    layerSource: VectorSource | null;
+    isCluster: boolean;
 
-    constructor(layer: VectorLayer<Cluster<Feature>>) {
+    constructor(layer: LayersType) {
         this.layer = layer;
+        this.isCluster = this.layer.getSource() instanceof Cluster;
+        this.layerSource = this.getFeaturesSource();
+    }
+
+    getFeaturesSource() {
+        const layerSource = this.layer.getSource();
+        let res = layerSource;
+
+        if (this.isCluster && layerSource) {
+            const clusterLayer = layerSource as unknown as VectorLayer<Cluster<Feature>>;
+            const clusterSource = clusterLayer.getSource();
+            res = clusterSource;
+        }
+
+        return res;
     }
 
     // Метод для установки/обновления данных
@@ -15,24 +34,16 @@ export class YourMapDataProcessing {
         const format = new GeoJSON();
         const features = format.readFeatures(data);
 
-        // Получаем кластерный источник и его внутренний векторный источник
-        const clusterSource = this.layer.getSource();
-        if (clusterSource) {
-            const vectorSource = clusterSource.getSource();
-            if (vectorSource) {
-                // Очищаем старые features и добавляем новые
-                vectorSource.clear();
-                vectorSource.addFeatures(features);
-            }
+        if (this.layerSource) {
+            this.layerSource.clear();
+            this.layerSource.addFeatures(features);
         }
     }
 
     // Дополнительные методы для работы с данными
     clearData() {
-        const clusterSource = this.layer.getSource();
-        if (clusterSource) {
-            const vectorSource = clusterSource.getSource();
-            vectorSource?.clear();
+        if (this.layerSource) {
+            this.layerSource.clear();
         }
     }
 
@@ -41,10 +52,8 @@ export class YourMapDataProcessing {
         const format = new GeoJSON();
         const features = format.readFeatures(data);
 
-        const clusterSource = this.layer.getSource();
-        if (clusterSource) {
-            const vectorSource = clusterSource.getSource();
-            vectorSource?.addFeatures(features);
+        if (this.layerSource) {
+            this.layerSource.addFeatures(features);
         }
     }
 }
