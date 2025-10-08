@@ -1,4 +1,3 @@
-import GeoJSON from "ol/format/GeoJSON";
 import { useGeographic } from "ol/proj";
 import Map from "ol/Map";
 import View from "ol/View";
@@ -9,12 +8,13 @@ import Cluster from "ol/source/Cluster";
 import OSM from "ol/source/OSM";
 import { type StyleLike } from "ol/style/Style";
 import { DEFAULT_CONSTRUCTOR_OPTIONS, DEFAULT_STYLES } from "./MapConstants";
-import Select from "ol/interaction/Select";
-import { click } from "ol/events/condition";
-import { Collection, type Feature } from "ol";
+import { type Feature } from "ol";
 import { YourMapDataProcessing } from "./YourMapDataProcessing";
 import { YourMapStyling } from "./YourMapStyling";
 import { YourMapInteraction } from "./YourMapInteraction";
+import type BaseLayer from "ol/layer/Base";
+
+type TaggedString<T extends string> = T | (string & {});
 
 /**
  * longitude, latitude
@@ -37,23 +37,26 @@ export type YourMapOptions = {
     interactionHandler?: InteractionFunctionType;
 };
 
-export type YourMapProvideObjType = {
-    dataLayer: VectorLayer<Cluster<Feature>>;
-    olMap: Map | null;
-};
+export type LayersNamesType = TaggedString<"main">;
 
-export type YourMapInterfaces = {
-    data?: YourMapDataProcessing;
-    style?: YourMapStyling;
-    interaction?: YourMapInteraction;
-};
+type LayersObjType = Partial<
+    Record<
+        LayersNamesType,
+        {
+            layer: VectorLayer<Cluster<Feature>>;
+            data: YourMapDataProcessing;
+            style: YourMapStyling;
+            interaction: YourMapInteraction;
+        }
+    >
+>;
 
 export class YourMap {
     private baseLayer = new TileLayer({
         source: new OSM(),
     });
 
-    dataLayer = new VectorLayer({
+    private dataLayer = new VectorLayer({
         source: new Cluster({
             distance: 15,
             source: new VectorSource(), // Инициализируем пустым источником
@@ -61,19 +64,16 @@ export class YourMap {
         style: DEFAULT_STYLES,
     });
 
+    private layers: LayersObjType = {};
+
     olMap: Map | null;
 
-    private provideObj: YourMapProvideObjType = {
-        dataLayer: this.dataLayer,
-        olMap: null,
-    };
-
-    private interfaces: YourMapInterfaces = {};
-
-    center: CoordinateType = [44.002, 56.3287];
-    zoom: number = 11;
+    private center: CoordinateType = [44.002, 56.3287];
+    private zoom: number = 11;
 
     constructor(options: YourMapOptions) {
+        this.generateLayers();
+
         useGeographic();
 
         const _options = { ...DEFAULT_CONSTRUCTOR_OPTIONS, ...options };
@@ -96,54 +96,71 @@ export class YourMap {
 
         this.olMap = new Map({
             target: "map",
-            layers: [this.baseLayer, this.dataLayer],
+            layers: [this.baseLayer, ...Object.values(this.layers).map((el) => el!.layer)],
             view: new View({
                 center: this.center,
                 zoom: this.zoom,
             }),
         });
 
-        this.generateProvideObj();
-        this.generateInterfaces();
-
-        if (this.interfaces.interaction !== undefined)
-            this.interfaces.interaction.configureSelectedFeatures(_options.interactionHandler);
+        for (let key in this.layers) {
+            const select = this.layers[key]!.interaction.configureSelectedFeatures(
+                _options.interactionHandler,
+            );
+            this.olMap.addInteraction(select);
+        }
 
         // Преобразуем GeoJSON в features и добавляем в dataLayer
-        if (_options.data && this.interfaces.data) this.interfaces.data.setData(_options.data);
+        if (_options.data)
+            for (let key in this.layers) {
+                this.layers[key]!.data.setData(_options.data);
+            }
     }
 
-    private generateProvideObj() {
-        this.provideObj.olMap = this.olMap;
+    private generateLayers() {
+        this.layers = {
+            main: {
+                layer: this.dataLayer,
+                data: new YourMapDataProcessing(this.dataLayer),
+                style: new YourMapStyling(this.dataLayer),
+                interaction: new YourMapInteraction(this.dataLayer),
+            },
+        };
     }
 
-    private generateInterfaces() {
-        this.interfaces.data = new YourMapDataProcessing(this.provideObj);
-        this.interfaces.style = new YourMapStyling(this.provideObj);
-        this.interfaces.interaction = new YourMapInteraction(this.provideObj);
+    /** ===============================================
+     **              Work with layers                **
+     * ============================================= */
+
+    getLayers() {
+        return this.layers;
+    }
+
+    getLayer(layerName: string): LayersObjType[string] | undefined {
+        return this.layers[layerName];
     }
 
     /** ===============================================
      **               interfaces.data                **
      * ============================================= */
 
-    setData(data: GeoJSON.FeatureCollection) {
-        this.interfaces.data?.setData(data);
+    setData(data: GeoJSON.FeatureCollection, layerName: LayersNamesType = "main") {
+        this.layers[layerName]?.data.setData(data);
     }
 
-    clearData() {
-        this.interfaces.data?.clearData();
+    clearData(layerName: LayersNamesType = "main") {
+        this.layers[layerName]?.data.clearData();
     }
 
-    addData(data: GeoJSON.FeatureCollection) {
-        this.interfaces.data?.addData(data);
+    addData(data: GeoJSON.FeatureCollection, layerName: LayersNamesType = "main") {
+        this.layers[layerName]?.data.addData(data);
     }
 
     /** ===============================================
      **              interfaces.style                **
      * ============================================= */
 
-    setStyles(styleFunction: StyleLike) {
-        this.interfaces.style?.setStyles(styleFunction);
+    setStyles(styleFunction: StyleLike, layerName: LayersNamesType = "main") {
+        this.layers[layerName]?.style.setStyles(styleFunction);
     }
 }

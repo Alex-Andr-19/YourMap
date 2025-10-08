@@ -1,27 +1,25 @@
-import { Collection, Map, type Feature } from "ol";
-import type VectorLayer from "ol/layer/Vector";
-import type { Cluster } from "ol/source";
-import type { InteractionFunctionType, YourMapProvideObjType } from "./YourMap";
+import { Collection, type Feature } from "ol";
+import type { InteractionFunctionType } from "./YourMap";
 import Select from "ol/interaction/Select";
 import { click } from "ol/events/condition";
+import type VectorLayer from "ol/layer/Vector";
+import type { Cluster } from "ol/source";
 
 export class YourMapInteraction {
-    private dataLayer: VectorLayer<Cluster<Feature>>;
+    private layer: VectorLayer<Cluster<Feature>>;
     private select: Select;
     private selectedFeatures: Collection<Feature> = new Collection();
-    private olMap: Map | null;
 
-    constructor(provideObj: YourMapProvideObjType) {
-        this.dataLayer = provideObj.dataLayer;
-        this.olMap = provideObj.olMap;
+    constructor(layer: VectorLayer<Cluster<Feature>>) {
+        this.layer = layer;
         this.select = new Select({
             condition: click,
-            layers: [this.dataLayer],
+            layers: [this.layer],
         });
     }
 
     configureSelectedFeatures(interactionHandler?: InteractionFunctionType) {
-        this.olMap!.addInteraction(this.select);
+        // this.olMap!.addInteraction(this.select);
         this.selectedFeatures = this.select.getFeatures();
 
         this.selectedFeatures.on("add", (e) => {
@@ -37,5 +35,7 @@ export class YourMapInteraction {
             const feature = e.element;
             console.log(feature);
         });
+
+        return this.select;
     }
 }

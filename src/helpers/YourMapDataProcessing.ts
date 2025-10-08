@@ -1,14 +1,13 @@
 import GeoJSON from "ol/format/GeoJSON";
-import VectorLayer from "ol/layer/Vector";
-import { Cluster } from "ol/source";
+import type VectorLayer from "ol/layer/Vector";
+import type { Cluster } from "ol/source";
 import type { Feature } from "ol";
-import type { YourMapProvideObjType } from "./YourMap";
 
 export class YourMapDataProcessing {
-    private dataLayer: VectorLayer<Cluster<Feature>>;
+    layer: VectorLayer<Cluster<Feature>>;
 
-    constructor(provideObj: YourMapProvideObjType) {
-        this.dataLayer = provideObj.dataLayer;
+    constructor(layer: VectorLayer<Cluster<Feature>>) {
+        this.layer = layer;
     }
 
     // Метод для установки/обновления данных
@@ -17,7 +16,7 @@ export class YourMapDataProcessing {
         const features = format.readFeatures(data);
 
         // Получаем кластерный источник и его внутренний векторный источник
-        const clusterSource = this.dataLayer.getSource();
+        const clusterSource = this.layer.getSource();
         if (clusterSource) {
             const vectorSource = clusterSource.getSource();
             if (vectorSource) {
@@ -30,7 +29,7 @@ export class YourMapDataProcessing {
 
     // Дополнительные методы для работы с данными
     clearData() {
-        const clusterSource = this.dataLayer.getSource();
+        const clusterSource = this.layer.getSource();
         if (clusterSource) {
             const vectorSource = clusterSource.getSource();
             vectorSource?.clear();
@@ -42,7 +41,7 @@ export class YourMapDataProcessing {
         const format = new GeoJSON();
         const features = format.readFeatures(data);
 
-        const clusterSource = this.dataLayer.getSource();
+        const clusterSource = this.layer.getSource();
         if (clusterSource) {
             const vectorSource = clusterSource.getSource();
             vectorSource?.addFeatures(features);
