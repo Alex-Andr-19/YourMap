@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
-import { YourMap } from "@/helpers/YourMap";
-import { generateGeoJSON } from "@/helpers/GenerateGeoJSON";
+import { YourMap } from "@/helpers/YourMap/YourMap";
+import { generateGeoJSON } from "@/helpers/YourMap/GenerateGeoJSON";
 import CircleStyle from "ol/style/Circle";
 import Fill from "ol/style/Fill";
 import Stroke from "ol/style/Stroke";

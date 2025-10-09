@@ -7,7 +7,7 @@ import { type StyleFunction } from "ol/style/Style";
 import { DEFAULT_MAP_OPTIONS } from "./MapConstants";
 import type { FeatureLike } from "ol/Feature";
 import { YourMapLayer } from "./YourMapLayer";
-import { clone } from "./deepClone";
+import { clone } from "../deepClone";
 import type {
     CoordinateType,
     LayersNamesType,

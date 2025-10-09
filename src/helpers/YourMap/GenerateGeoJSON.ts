@@ -1,4 +1,4 @@
-import type { CoordinateType } from "./YourMap";
+import type { CoordinateType } from "./types";
 
 const firstPoint: CoordinateType = [43.84, 56.37];
 const secondPoint: CoordinateType = [44.15, 56.24];
