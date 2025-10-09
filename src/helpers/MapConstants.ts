@@ -3,7 +3,7 @@ import Fill from "ol/style/Fill";
 import Stroke from "ol/style/Stroke";
 import Style, { type StyleLike } from "ol/style/Style";
 import Text from "ol/style/Text";
-import { YourMap, type YourMapBaseOptions, type YourMapOptions } from "./YourMap";
+import { YourMap, type YourMapBaseOptions } from "./YourMap";
 import type { YourMapLayerOptionsType } from "./YourMapLayer";
 
 export const DEFAULT_STYLES: StyleLike = (feature) => {

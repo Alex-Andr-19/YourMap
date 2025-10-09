@@ -6,7 +6,7 @@ import VectorLayer from "ol/layer/Vector";
 import Cluster from "ol/source/Cluster";
 import OSM from "ol/source/OSM";
 import { type StyleFunction } from "ol/style/Style";
-import { DEFAULT_LAYER_OPTIONS, DEFAULT_MAP_OPTIONS } from "./MapConstants";
+import { DEFAULT_MAP_OPTIONS } from "./MapConstants";
 import { type Feature } from "ol";
 import type { FeatureLike } from "ol/Feature";
 import { YourMapLayer, type YourMapLayerOptionsType } from "./YourMapLayer";
