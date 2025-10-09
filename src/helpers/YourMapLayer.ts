@@ -8,20 +8,7 @@ import VectorSource from "ol/source/Vector";
 import { DEFAULT_LAYER_OPTIONS } from "./MapConstants";
 import type { StyleFunction } from "ol/style/Style";
 import type Select from "ol/interaction/Select";
-
-export type LayersType = VectorLayer<Cluster<Feature>> | VectorLayer;
-
-/**
- * Function for handle click on cluster features
- */
-export type InteractionFunctionType = (features: ReturnType<Feature["getProperties"]>[]) => void;
-
-export type YourMapLayerOptionsType = {
-    data?: GeoJSON.FeatureCollection;
-    isClustering?: boolean;
-    interactionHandler?: InteractionFunctionType;
-    style?: StyleFunction;
-};
+import type { LayersType, YourMapLayerOptionsType } from "./types";
 
 export class YourMapLayer {
     olLayer: LayersType;

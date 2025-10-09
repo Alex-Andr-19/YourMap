@@ -2,48 +2,20 @@ import { useGeographic } from "ol/proj";
 import Map from "ol/Map";
 import View from "ol/View";
 import TileLayer from "ol/layer/Tile";
-import VectorLayer from "ol/layer/Vector";
-import Cluster from "ol/source/Cluster";
 import OSM from "ol/source/OSM";
 import { type StyleFunction } from "ol/style/Style";
 import { DEFAULT_MAP_OPTIONS } from "./MapConstants";
-import { type Feature } from "ol";
 import type { FeatureLike } from "ol/Feature";
-import { YourMapLayer, type YourMapLayerOptionsType } from "./YourMapLayer";
+import { YourMapLayer } from "./YourMapLayer";
 import { clone } from "./deepClone";
-
-type TaggedString<T extends string> = T | (string & {});
-
-/**
- * longitude, latitude
- *
- * широта, долгота
- */
-export type CoordinateType = [number, number];
-
-/**
- * Function for handle click on cluster features
- */
-export type InteractionFunctionType = (features: ReturnType<Feature["getProperties"]>[]) => void;
-
-export type YourMapBaseOptions = {
-    darkTheme?: boolean;
-    target?: string;
-};
-
-type LayersObjType<T = YourMapLayer> = Partial<Record<LayersNamesType, T>>;
-type YourMapOptionsSingleLayer = YourMapBaseOptions & YourMapLayerOptionsType;
-type YourMapOptionsMultyLayers = YourMapBaseOptions & {
-    layers: LayersObjType<YourMapLayerOptionsType>;
-};
-
-/**
- * Configuration to constructor of YourMap class
- */
-export type YourMapOptions = YourMapOptionsSingleLayer | YourMapOptionsMultyLayers;
-
-export type LayersNamesType = TaggedString<"main">;
-export type LayersType = VectorLayer<Cluster<Feature>> | VectorLayer;
+import type {
+    CoordinateType,
+    LayersNamesType,
+    LayersObjType,
+    YourMapBaseOptions,
+    YourMapOptions,
+    YourMapOptionsMultyLayers,
+} from "./types";
 
 useGeographic();
 export class YourMap {

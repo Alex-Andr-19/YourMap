@@ -1,11 +1,11 @@
 import CircleStyle from "ol/style/Circle";
 import Fill from "ol/style/Fill";
 import Stroke from "ol/style/Stroke";
-import Style, { type StyleFunction, type StyleLike } from "ol/style/Style";
+import Style, { type StyleFunction } from "ol/style/Style";
 import Text from "ol/style/Text";
-import { YourMap, type YourMapBaseOptions } from "./YourMap";
-import type { YourMapLayerOptionsType } from "./YourMapLayer";
 import type { FeatureLike } from "ol/Feature";
+import { YourMap } from "./YourMap";
+import type { YourMapBaseOptions, YourMapLayerOptionsType } from "./types";
 
 export const DEFAULT_STYLES: StyleFunction = (feature: FeatureLike) => {
     return new Style({

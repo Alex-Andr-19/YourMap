@@ -1,8 +1,8 @@
 import { Collection, type Feature } from "ol";
-import type { InteractionFunctionType, LayersType } from "./YourMap";
 import Select from "ol/interaction/Select";
 import { click } from "ol/events/condition";
 import { Cluster } from "ol/source";
+import type { InteractionFunctionType, LayersType } from "./types";
 
 export class YourMapInteraction {
     select: Select;
