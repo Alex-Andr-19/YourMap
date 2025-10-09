@@ -10,12 +10,14 @@ import { YourMapLayer } from "./YourMapLayer";
 import { clone } from "../deepClone";
 import type {
     CoordinateType,
+    FeatureStringType,
     LayersNamesType,
     LayersObjType,
     YourMapBaseOptions,
     YourMapOptions,
     YourMapOptionsMultyLayers,
 } from "./types";
+import { Point } from "ol/geom";
 
 useGeographic();
 export class YourMap {
@@ -153,5 +155,16 @@ export class YourMap {
 
     static isFeatureCluster(feature: FeatureLike) {
         return !!feature.get("features")?.length;
+    }
+
+    static getTypeOfFeature(feature: FeatureLike): FeatureStringType | null {
+        let res: FeatureStringType | null = null;
+
+        if (feature.getGeometry() instanceof Point) {
+            if (this.isFeatureCluster(feature)) res = "cluster";
+            else res = "point";
+        }
+
+        return res;
     }
 }

@@ -5,14 +5,16 @@ import { YourMapDataProcessing } from "./YourMapDataProcessing";
 import { YourMapStyling } from "./YourMapStyling";
 import { YourMapInteraction } from "./YourMapInteraction";
 import VectorSource from "ol/source/Vector";
-import { DEFAULT_LAYER_OPTIONS } from "./MapConstants";
+import { DEFAULT_LAYER_OPTIONS, DEFAULT_STYLES_2 } from "./MapConstants";
 import type { StyleFunction } from "ol/style/Style";
 import type Select from "ol/interaction/Select";
 import type { LayersType, YourMapLayerOptionsType } from "./types";
+import type { FeatureLike } from "ol/Feature";
+import type Style from "ol/style/Style";
+import { YourMap } from "./YourMap";
 
 export class YourMapLayer {
     olLayer: LayersType;
-    select: Select;
     interaction: YourMapInteraction;
 
     private data: YourMapDataProcessing;
@@ -28,20 +30,31 @@ export class YourMapLayer {
                       source: new VectorSource(), // Инициализируем пустым источником
                   })
                 : new VectorSource(),
-            style: options.style,
+            style: this.styleFunction.bind(this),
         });
 
         this.data = new YourMapDataProcessing(this.olLayer);
-        this.style = new YourMapStyling(this.olLayer);
+        this.style = new YourMapStyling({
+            layer: this.olLayer,
+            layerStyle: options.style,
+        });
         this.interaction = new YourMapInteraction(this.olLayer);
-
-        this.select = this.interaction.select;
 
         if (options.data) {
             this.data.addData(options.data);
         }
 
         this.interaction.configureSelectedFeatures(options.interactionHandler);
+    }
+
+    styleFunction(feature: FeatureLike, resolution: number): Style {
+        const featureType = YourMap.getTypeOfFeature(feature);
+        const isFeatureSelected = this.interaction.isFeatureSelected(feature as Feature);
+
+        return DEFAULT_STYLES_2[featureType || "point"][isFeatureSelected ? "selected" : "plain"](
+            feature,
+            resolution,
+        ) as Style;
     }
 
     setData(data: GeoJSON.FeatureCollection) {
@@ -58,5 +71,9 @@ export class YourMapLayer {
 
     setStyles(styleFunction: StyleFunction) {
         this.style.setStyles(styleFunction);
+    }
+
+    bindInteractionToMap() {
+        this.interaction.bindInteractionToMap();
     }
 }

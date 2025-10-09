@@ -10,14 +10,40 @@ import type { StyleFunction } from "ol/style/Style";
 export type TaggedString<T extends string> = T | (string & {});
 
 /** ===============================================
+ **               Features types                 **
+ * ============================================= */
+
+export type FeatureStringType = "point" | "cluster";
+
+/** ===============================================
+ **           Features styles types              **
+ * ============================================= */
+
+export type YourMapStylingOptionsType = {
+    layer: LayersType;
+    layerStyle: YourMapLayerStyleType;
+};
+
+export type FeatureStyleType = {
+    plain: StyleFunction;
+    selected: StyleFunction;
+};
+
+export type FeatureStyleOptionType = Record<FeatureStringType, FeatureStyleType | StyleFunction>;
+export type FeatureStyleFullOptionType = Record<FeatureStringType, FeatureStyleType>;
+
+/** ===============================================
  **             YourMapLayer types               **
  * ============================================= */
+
+export type YourMapLayerStyleType = FeatureStyleOptionType | StyleFunction;
 
 export type YourMapLayerOptionsType = {
     data?: GeoJSON.FeatureCollection;
     isClustering?: boolean;
     interactionHandler?: InteractionFunctionType;
-    style?: StyleFunction;
+    // style?: StyleFunction;
+    style?: YourMapLayerStyleType;
 };
 
 /** ===============================================

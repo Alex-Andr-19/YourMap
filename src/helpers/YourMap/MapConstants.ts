@@ -5,7 +5,11 @@ import Style, { type StyleFunction } from "ol/style/Style";
 import Text from "ol/style/Text";
 import type { FeatureLike } from "ol/Feature";
 import { YourMap } from "./YourMap";
-import type { YourMapBaseOptions, YourMapLayerOptionsType } from "./types";
+import type {
+    FeatureStyleFullOptionType,
+    YourMapBaseOptions,
+    YourMapLayerOptionsType,
+} from "./types";
 
 export const DEFAULT_STYLES: StyleFunction = (feature: FeatureLike) => {
     return new Style({
@@ -31,7 +35,18 @@ export const DEFAULT_STYLES: StyleFunction = (feature: FeatureLike) => {
     });
 };
 
-export const DEFAULT_MAP_OPTIONS: YourMapBaseOptions = {
+export const DEFAULT_STYLES_2: FeatureStyleFullOptionType = {
+    point: {
+        plain: DEFAULT_STYLES,
+        selected: DEFAULT_STYLES,
+    },
+    cluster: {
+        plain: DEFAULT_STYLES,
+        selected: DEFAULT_STYLES,
+    },
+};
+
+export const DEFAULT_MAP_OPTIONS: Required<YourMapBaseOptions> = {
     darkTheme: true,
     target: "map",
 };

@@ -1,11 +1,13 @@
 import type { StyleLike } from "ol/style/Style";
-import type { LayersType } from "./types";
+import type { FeatureStyleFullOptionType, LayersType, YourMapStylingOptionsType } from "./types";
 
 export class YourMapStyling {
     layer: LayersType;
+    // layerStyle: FeatureStyleFullOptionType;
 
-    constructor(layer: LayersType) {
-        this.layer = layer;
+    constructor(_options: YourMapStylingOptionsType) {
+        this.layer = _options.layer;
+        // this.layerStyle = {};
     }
 
     setStyles(styleFunction: StyleLike) {
