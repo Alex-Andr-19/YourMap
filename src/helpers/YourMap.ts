@@ -58,7 +58,7 @@ export class YourMap {
     private center: CoordinateType = [44.002, 56.3287];
     private zoom: number = 11;
 
-    constructor(_options: YourMapOptions) {
+    constructor(_options?: YourMapOptions) {
         const options = this.configureOptions({ ...DEFAULT_MAP_OPTIONS, ..._options });
 
         this.generateLayers(options);

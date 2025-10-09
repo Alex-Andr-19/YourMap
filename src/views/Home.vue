@@ -107,7 +107,7 @@ function createMap2() {
 
 let map_3: YourMap;
 function createMap3() {
-    map_3 = new YourMap({ target: "map3" });
+    map_3 = new YourMap();
     getData().then((res) => {
         map_3.setData(res);
     });
@@ -126,7 +126,7 @@ onMounted(() => {
 
         <div id="map1"></div>
         <div id="map2"></div>
-        <div id="map3"></div>
+        <div id="map"></div>
     </div>
 </template>
 
