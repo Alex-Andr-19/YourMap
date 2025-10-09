@@ -66,11 +66,12 @@ const localStyleFunction2: StyleFunction = (feature: FeatureLike) => {
 };
 
 let map_1: YourMap;
-function createMap1() {
+async function createMap1() {
     map_1 = new YourMap({
         target: "map1",
         layers: {
             first: {
+                data: await getData(),
                 interactionHandler: (features) => {
                     console.log("Hallo, world!!!", features);
                 },
@@ -82,11 +83,9 @@ function createMap1() {
             },
         },
     });
-    Promise.all([getData(), getData()]).then((res) => {
-        map_1.setData(res[0], "first");
-        setTimeout(() => {
-            map_1.setData(res[1], "second");
-        }, 1000);
+
+    getData().then((res) => {
+        map_1.setData(res, "second");
     });
 }
 
