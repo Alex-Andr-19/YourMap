@@ -3,6 +3,7 @@ import type { YourMapLayer } from "./YourMapLayer";
 import type VectorLayer from "ol/layer/Vector";
 import type { Cluster } from "ol/source";
 import type { StyleFunction } from "ol/style/Style";
+import type { YourMapInteraction } from "./YourMapInteraction";
 
 /** ===============================================
  **               Utilities types                **
@@ -29,14 +30,26 @@ export type FeatureStyleType = {
     selected: StyleFunction;
 };
 
-export type FeatureStyleOptionType = Record<FeatureStringType, FeatureStyleType | StyleFunction>;
+export type FeatureStyleOptionType = Record<
+    FeatureStringType,
+    Partial<FeatureStyleType> | StyleFunction
+>;
 export type FeatureStyleFullOptionType = Record<FeatureStringType, FeatureStyleType>;
+
+/** ===============================================
+ **        Features interactions types           **
+ * ============================================= */
+
+export type YourMapInteractionsOptionsType = {
+    layer: LayersType;
+    styles: FeatureStyleFullOptionType;
+};
 
 /** ===============================================
  **             YourMapLayer types               **
  * ============================================= */
 
-export type YourMapLayerStyleType = FeatureStyleOptionType | StyleFunction;
+export type YourMapLayerStyleType = Partial<FeatureStyleOptionType> | StyleFunction;
 
 export type YourMapLayerOptionsType = {
     data?: GeoJSON.FeatureCollection;

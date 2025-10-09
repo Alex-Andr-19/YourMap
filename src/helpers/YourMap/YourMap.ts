@@ -153,16 +153,14 @@ export class YourMap {
      **               Static methods                 **
      * ============================================= */
 
-    static isFeatureCluster(feature: FeatureLike) {
-        return !!feature.get("features")?.length;
-    }
-
     static getTypeOfFeature(feature: FeatureLike): FeatureStringType | null {
         let res: FeatureStringType | null = null;
 
         if (feature.getGeometry() instanceof Point) {
-            if (this.isFeatureCluster(feature)) res = "cluster";
-            else res = "point";
+            if (feature.get("features")?.length !== undefined) {
+                if (feature.get("features")?.length < 2) res = "point";
+                else res = "cluster";
+            } else res = "point";
         }
 
         return res;

@@ -28,7 +28,7 @@ const localStyleFunction1: StyleFunction = (feature: FeatureLike) => {
                 color: "#339900",
             }),
         }),
-        ...(YourMap.isFeatureCluster(feature)
+        ...(YourMap.getTypeOfFeature(feature) === "cluster"
             ? {
                   text: new Text({
                       text: feature.get("features").length.toString(),
@@ -52,7 +52,7 @@ const localStyleFunction2: StyleFunction = (feature: FeatureLike) => {
                 color: "#f00",
             }),
         }),
-        ...(YourMap.isFeatureCluster(feature)
+        ...(YourMap.getTypeOfFeature(feature) === "cluster"
             ? {
                   text: new Text({
                       text: feature.get("features").length.toString(),
@@ -79,7 +79,12 @@ async function createMap1() {
             },
             second: {
                 isClustering: false,
-                style: localStyleFunction2,
+                style: {
+                    point: {
+                        plain: localStyleFunction2,
+                        selected: localStyleFunction1,
+                    },
+                },
             },
         },
     });
@@ -98,8 +103,8 @@ function createMap2() {
         interactionHandler: (features) => {
             console.log("Here!!!", features);
         },
-        style: localStyleFunction1,
     });
+    map_2.setStyles(localStyleFunction1);
     getData().then((res) => {
         map_2.setData(res);
     });

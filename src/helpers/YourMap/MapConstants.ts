@@ -22,7 +22,7 @@ export const DEFAULT_STYLES: StyleFunction = (feature: FeatureLike) => {
                 color: "#99C",
             }),
         }),
-        ...(YourMap.isFeatureCluster(feature)
+        ...(YourMap.getTypeOfFeature(feature) === "cluster"
             ? {
                   text: new Text({
                       text: feature.get("features").length.toString(),
