@@ -5,11 +5,10 @@ import { Cluster } from "ol/source";
 import type { InteractionFunctionType, LayersType } from "./types";
 
 export class YourMapInteraction {
-    select: Select;
-
     private layer: LayersType;
     private isClustering: boolean;
     private selectedFeatures: Collection<Feature> = new Collection();
+    private select: Select;
 
     constructor(layer: LayersType) {
         this.layer = layer;
@@ -39,5 +38,13 @@ export class YourMapInteraction {
                 console.log(feature);
             });
         }
+    }
+
+    isFeatureSelected(feature: Feature): boolean {
+        return this.selectedFeatures.getArray().includes(feature);
+    }
+
+    bindInteractionToMap() {
+        this.layer.getMapInternal()?.addInteraction(this.select);
     }
 }

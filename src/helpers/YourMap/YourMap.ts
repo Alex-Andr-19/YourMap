@@ -85,7 +85,7 @@ export class YourMap {
 
     private bindInteractions(options: YourMapOptionsMultyLayers) {
         for (let key in options.layers) {
-            this.olMap!.addInteraction(this.layers[key]!.select);
+            this.layers[key]!.bindInteractionToMap();
         }
     }
 
