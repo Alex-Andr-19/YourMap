@@ -30,7 +30,9 @@ export class YourMapLayer {
     private data: YourMapDataProcessing;
     private style: YourMapStyling;
 
-    constructor(options: YourMapLayerOptionsType) {
+    constructor(_options: YourMapLayerOptionsType) {
+        const options = { ...DEFAULT_LAYER_OPTIONS, ..._options };
+
         this.olLayer = new VectorLayer({
             source: options.isClustering
                 ? new Cluster({
@@ -50,6 +52,8 @@ export class YourMapLayer {
         if (options.data) {
             this.data.addData(options.data);
         }
+
+        this.interaction.configureSelectedFeatures(options.interactionHandler);
     }
 
     setData(data: GeoJSON.FeatureCollection) {

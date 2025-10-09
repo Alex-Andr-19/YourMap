@@ -94,16 +94,17 @@ export class YourMap {
         if (isMultyLayers) {
             res.layers = {};
             for (let key in layersOptions.layers) {
-                res.layers[key] = { ...DEFAULT_LAYER_OPTIONS, ...layersOptions.layers[key] };
+                res.layers[key] = layersOptions.layers[key];
             }
         } else {
-            res.layers = { main: { ...DEFAULT_LAYER_OPTIONS, ...layersOptions } };
+            res.layers = { main: layersOptions };
         }
 
         return res;
     }
 
     private generateLayers(options: YourMapOptionsMultyLayers) {
+        console.log("Map options:", options);
         for (let key in options.layers) {
             this.layers[key] = new YourMapLayer({
                 ...options.layers[key],
@@ -113,9 +114,6 @@ export class YourMap {
 
     private bindInteractions(options: YourMapOptionsMultyLayers) {
         for (let key in options.layers) {
-            this.layers[key]!.interaction.configureSelectedFeatures(
-                options.layers[key]!.interactionHandler,
-            );
             this.olMap!.addInteraction(this.layers[key]!.select);
         }
     }
