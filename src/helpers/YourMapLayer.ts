@@ -5,7 +5,7 @@ import { YourMapDataProcessing } from "./YourMapDataProcessing";
 import { YourMapStyling } from "./YourMapStyling";
 import { YourMapInteraction } from "./YourMapInteraction";
 import VectorSource from "ol/source/Vector";
-import { DEFAULT_LAYER_OPTIONS, DEFAULT_STYLES } from "./MapConstants";
+import { DEFAULT_LAYER_OPTIONS } from "./MapConstants";
 import type { StyleFunction } from "ol/style/Style";
 import type Select from "ol/interaction/Select";
 
@@ -20,6 +20,7 @@ export type YourMapLayerOptionsType = {
     data?: GeoJSON.FeatureCollection;
     isClustering?: boolean;
     interactionHandler?: InteractionFunctionType;
+    style?: StyleFunction;
 };
 
 export class YourMapLayer {
@@ -40,7 +41,7 @@ export class YourMapLayer {
                       source: new VectorSource(), // Инициализируем пустым источником
                   })
                 : new VectorSource(),
-            style: DEFAULT_STYLES,
+            style: options.style,
         });
 
         this.data = new YourMapDataProcessing(this.olLayer);

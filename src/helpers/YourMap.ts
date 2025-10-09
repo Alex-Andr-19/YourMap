@@ -104,7 +104,6 @@ export class YourMap {
     }
 
     private generateLayers(options: YourMapOptionsMultyLayers) {
-        console.log("Map options:", options);
         for (let key in options.layers) {
             this.layers[key] = new YourMapLayer({
                 ...options.layers[key],

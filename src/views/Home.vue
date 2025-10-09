@@ -74,14 +74,14 @@ function createMap1() {
                 interactionHandler: (features) => {
                     console.log("Hallo, world!!!", features);
                 },
+                style: localStyleFunction1,
             },
             second: {
                 isClustering: false,
+                style: localStyleFunction2,
             },
         },
     });
-    map_1.setStyles(localStyleFunction1, "first");
-    map_1.setStyles(localStyleFunction2, "second");
     Promise.all([getData(), getData()]).then((res) => {
         map_1.setData(res[0], "first");
         setTimeout(() => {
@@ -99,9 +99,8 @@ function createMap2() {
         interactionHandler: (features) => {
             console.log("Here!!!", features);
         },
+        style: localStyleFunction1,
     });
-
-    map_2.setStyles(localStyleFunction1);
     getData().then((res) => {
         map_2.setData(res);
     });
