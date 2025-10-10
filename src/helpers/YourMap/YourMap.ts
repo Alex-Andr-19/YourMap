@@ -3,7 +3,6 @@ import Map from "ol/Map";
 import View from "ol/View";
 import TileLayer from "ol/layer/Tile";
 import OSM from "ol/source/OSM";
-import { type StyleFunction } from "ol/style/Style";
 import { DEFAULT_MAP_OPTIONS } from "./MapConstants";
 import type { FeatureLike } from "ol/Feature";
 import { YourMapLayer } from "./YourMapLayer";

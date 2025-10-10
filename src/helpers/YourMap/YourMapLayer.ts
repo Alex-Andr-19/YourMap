@@ -5,9 +5,7 @@ import { YourMapStyling } from "./YourMapStyling";
 import { YourMapInteraction } from "./YourMapInteraction";
 import VectorSource from "ol/source/Vector";
 import { DEFAULT_LAYER_OPTIONS } from "./MapConstants";
-import type { StyleFunction } from "ol/style/Style";
 import type { LayersType, YourMapLayerOptionsType, YourMapLayerStyleType } from "./types";
-import { clone } from "../deepClone";
 
 export class YourMapLayer {
     olLayer: LayersType;
