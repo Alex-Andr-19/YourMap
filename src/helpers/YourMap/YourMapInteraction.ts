@@ -11,10 +11,7 @@ import type {
 import type { FeatureLike } from "ol/Feature";
 import type Style from "ol/style/Style";
 import { YourMap } from "./YourMap";
-import { unByKey, type EventTypes } from "ol/Observable";
-import type { LayerRenderEventTypes } from "ol/render/EventType";
-import type { BaseLayerObjectEventTypes } from "ol/layer/Base";
-import type { LayerEventType } from "ol/layer/Layer";
+import { unByKey } from "ol/Observable";
 import type { EventsKey } from "ol/events";
 import type BaseEvent from "ol/events/Event";
 

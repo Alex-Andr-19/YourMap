@@ -6,6 +6,7 @@ import { YourMapInteraction } from "./YourMapInteraction";
 import VectorSource from "ol/source/Vector";
 import { DEFAULT_LAYER_OPTIONS } from "./MapConstants";
 import type { LayersType, YourMapLayerOptionsType, YourMapLayerStyleType } from "./types";
+import type { Feature } from "ol";
 
 export class YourMapLayer {
     olLayer: LayersType;
@@ -55,5 +56,9 @@ export class YourMapLayer {
 
     setStyles(options: YourMapLayerStyleType) {
         this.style.setStyles(options);
+    }
+
+    isFeatureSelected(feature: Feature) {
+        this.interaction.isFeatureSelected(feature);
     }
 }

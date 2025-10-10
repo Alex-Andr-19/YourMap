@@ -18,6 +18,7 @@ import type {
     YourMapOptionsMultyLayers,
 } from "./types";
 import { Point } from "ol/geom";
+import type Feature from "ol/Feature";
 
 useGeographic();
 export class YourMap {
@@ -139,6 +140,14 @@ export class YourMap {
 
     setStyles(options: YourMapLayerStyleType, layerName: LayersNamesType = "main") {
         this.layers[layerName]?.setStyles(options);
+    }
+
+    /** ===============================================
+     **          interfaces.interactions             **
+     * ============================================= */
+
+    isFeatureSelected(feature: Feature, layerName: LayersNamesType = "main") {
+        this.layers[layerName]?.isFeatureSelected(feature);
     }
 
     /** ===============================================
