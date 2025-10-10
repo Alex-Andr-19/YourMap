@@ -56,8 +56,4 @@ export class YourMapLayer {
     setStyles(options: YourMapLayerStyleType) {
         this.style.setStyles(options);
     }
-
-    bindInteractionToMap() {
-        this.interaction.bindInteractionToMap();
-    }
 }

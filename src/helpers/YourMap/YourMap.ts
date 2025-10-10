@@ -47,8 +47,6 @@ export class YourMap {
                 zoom: this.zoom,
             }),
         });
-
-        this.bindInteractions(options);
     }
 
     private configureOptions(_options: YourMapOptions) {
@@ -82,12 +80,6 @@ export class YourMap {
             this.layers[key] = new YourMapLayer({
                 ...options.layers[key],
             });
-        }
-    }
-
-    private bindInteractions(options: YourMapOptionsMultyLayers) {
-        for (let key in options.layers) {
-            this.layers[key]!.bindInteractionToMap();
         }
     }
 

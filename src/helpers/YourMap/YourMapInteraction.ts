@@ -1,4 +1,4 @@
-import { Collection, type Feature } from "ol";
+import { Collection, Map, type Feature } from "ol";
 import Select from "ol/interaction/Select";
 import { click } from "ol/events/condition";
 import { Cluster } from "ol/source";
@@ -11,6 +11,12 @@ import type {
 import type { FeatureLike } from "ol/Feature";
 import type Style from "ol/style/Style";
 import { YourMap } from "./YourMap";
+import { unByKey, type EventTypes } from "ol/Observable";
+import type { LayerRenderEventTypes } from "ol/render/EventType";
+import type { BaseLayerObjectEventTypes } from "ol/layer/Base";
+import type { LayerEventType } from "ol/layer/Layer";
+import type { EventsKey } from "ol/events";
+import type BaseEvent from "ol/events/Event";
 
 export class YourMapInteraction {
     private layer: LayersType;
@@ -18,6 +24,9 @@ export class YourMapInteraction {
     private selectedFeatures: Collection<Feature> = new Collection();
     private select: Select;
     private styles: FeatureStyleFullOptionType;
+    private olMap: Map | null = null;
+
+    private layerChangeListener: EventsKey;
 
     constructor(options: YourMapInteractionsOptionsType) {
         this.layer = options.layer;
@@ -28,6 +37,23 @@ export class YourMapInteraction {
             layers: [this.layer],
             style: this.styleFunction.bind(this),
         });
+
+        this.layerChangeListener = this.layer.on(
+            "change",
+            this.layerChangeListenerFunction.bind(this),
+        );
+    }
+
+    private layerChangeListenerFunction(ev: BaseEvent) {
+        setTimeout(() => {
+            console.count("change");
+            if (this.olMap === null) {
+                this.olMap = this.layer.getMapInternal();
+                this.olMap?.addInteraction(this.select);
+                console.log(this.olMap);
+                unByKey(this.layerChangeListener);
+            }
+        }, 200);
     }
 
     configureSelectedFeatures(interactionHandler?: InteractionFunctionType) {
@@ -59,9 +85,5 @@ export class YourMapInteraction {
 
     isFeatureSelected(feature: Feature): boolean {
         return this.selectedFeatures.getArray().includes(feature);
-    }
-
-    bindInteractionToMap() {
-        this.layer.getMapInternal()?.addInteraction(this.select);
     }
 }
