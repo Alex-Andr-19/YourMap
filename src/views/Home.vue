@@ -104,9 +104,6 @@ function createMap2() {
             console.log("Here!!!", features);
         },
     });
-    // map_2.setStyles({
-    //     point: localStyleFunction1,
-    // });
     map_2.setStyles(localStyleFunction1);
     getData().then((res) => {
         map_2.setData(res);
