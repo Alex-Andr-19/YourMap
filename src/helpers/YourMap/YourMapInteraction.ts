@@ -19,7 +19,7 @@ export class YourMapInteraction {
     private layer: LayersType;
     private isClustering: boolean;
     private selectedFeatures: Collection<Feature> = new Collection();
-    private select: Select;
+    private selectInteraction: Select;
     private styles: FeatureStyleFullOptionType;
     private olMap: Map | null = null;
 
@@ -29,7 +29,7 @@ export class YourMapInteraction {
         this.layer = options.layer;
         this.styles = options.styles;
         this.isClustering = this.layer.getSource() instanceof Cluster;
-        this.select = new Select({
+        this.selectInteraction = new Select({
             condition: click,
             layers: [this.layer],
             style: this.styleFunction.bind(this),
@@ -43,39 +43,51 @@ export class YourMapInteraction {
 
     private layerChangeListenerFunction(ev: BaseEvent) {
         setTimeout(() => {
-            if (this.olMap === null) {
-                this.olMap = this.layer.getMapInternal();
-                this.olMap?.addInteraction(this.select);
+            this.olMap = this.layer.getMapInternal();
+            if (this.olMap) {
+                this.configureParentMap();
                 unByKey(this.layerChangeListener);
             }
         }, 200);
     }
 
+    private configureParentMap() {
+        this.olMap!.addInteraction(this.selectInteraction);
+    }
+
+    private getFeaturesOnInteractionEvent(feature: Feature) {
+        let features = [feature];
+        if (this.isClustering) {
+            features = feature.get("features") as Feature[];
+        }
+
+        return new Set(features);
+    }
+
     configureSelectedFeatures(interactionHandler?: InteractionFunctionType) {
-        this.selectedFeatures = this.select.getFeatures();
+        this.selectedFeatures = this.selectInteraction.getFeatures();
 
         if (interactionHandler) {
             this.selectedFeatures.on("add", (e) => {
-                const feature = e.element;
-                let resFeature: Feature[] = [feature];
-                if (this.isClustering) {
-                    resFeature = feature.get("features") as Feature[];
-                }
-                const featuresProperties = resFeature.map((el) => el.getProperties());
+                const features = this.getFeaturesOnInteractionEvent(e.element);
+                const featuresProperties = [...features].map((el) => el.getProperties());
                 interactionHandler(featuresProperties);
             });
 
             this.selectedFeatures.on("remove", (e) => {
-                const feature = e.element;
-                console.log(feature);
+                console.log("Here!!!");
+                const features = this.getFeaturesOnInteractionEvent(e.element);
+                const featuresProperties = [...features].map((el) => el.getProperties());
+                console.log(featuresProperties);
             });
         }
     }
 
-    styleFunction(feature: FeatureLike, resolution: number): Style {
-        const featureType = YourMap.getTypeOfFeature(feature);
+    private styleFunction(feature: FeatureLike, resolution: number): Style {
+        const featureType = YourMap.getTypeOfFeature(feature) || "point";
 
-        return this.styles[featureType || "point"].selected(feature, resolution) as Style;
+        // TODO: Создать объект кэша стилей по id'шникам фичей внутри кластера
+        return this.styles[featureType].selected(feature, resolution) as Style;
     }
 
     isFeatureSelected(feature: Feature): boolean {

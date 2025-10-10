@@ -11,7 +11,31 @@ import type {
     YourMapLayerOptionsType,
 } from "./types";
 
-export const DEFAULT_STYLES: StyleFunction = (feature: FeatureLike) => {
+export const DEFAULT_POINT_STYLES: StyleFunction = (feature: FeatureLike) => {
+    return new Style({
+        image: new CircleStyle({
+            radius: 10,
+            stroke: new Stroke({
+                color: "#fff",
+            }),
+            fill: new Fill({
+                color: "#77A",
+            }),
+        }),
+        ...(YourMap.getTypeOfFeature(feature) === "cluster"
+            ? {
+                  text: new Text({
+                      text: feature.get("features").length.toString(),
+                      fill: new Fill({
+                          color: "#fff",
+                      }),
+                  }),
+              }
+            : {}),
+    });
+};
+
+export const DEFAULT_SELECTED_POINT_STYLES: StyleFunction = (feature: FeatureLike) => {
     return new Style({
         image: new CircleStyle({
             radius: 10,
@@ -37,12 +61,12 @@ export const DEFAULT_STYLES: StyleFunction = (feature: FeatureLike) => {
 
 export const DEFAULT_STYLES_2: FeatureStyleFullOptionType = {
     point: {
-        plain: DEFAULT_STYLES,
-        selected: DEFAULT_STYLES,
+        plain: DEFAULT_POINT_STYLES,
+        selected: DEFAULT_SELECTED_POINT_STYLES,
     },
     cluster: {
-        plain: DEFAULT_STYLES,
-        selected: DEFAULT_STYLES,
+        plain: DEFAULT_POINT_STYLES,
+        selected: DEFAULT_SELECTED_POINT_STYLES,
     },
 };
 
@@ -53,7 +77,7 @@ export const DEFAULT_MAP_OPTIONS: Required<YourMapBaseOptions> = {
 
 export const DEFAULT_LAYER_OPTIONS: Required<Omit<YourMapLayerOptionsType, "data">> = {
     isClustering: true,
-    style: DEFAULT_STYLES,
+    style: DEFAULT_POINT_STYLES,
     interactionHandler: (features) => {
         console.log("Default handler:", features);
     },
