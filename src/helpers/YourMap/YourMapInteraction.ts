@@ -46,11 +46,9 @@ export class YourMapInteraction {
 
     private layerChangeListenerFunction(ev: BaseEvent) {
         setTimeout(() => {
-            console.count("change");
             if (this.olMap === null) {
                 this.olMap = this.layer.getMapInternal();
                 this.olMap?.addInteraction(this.select);
-                console.log(this.olMap);
                 unByKey(this.layerChangeListener);
             }
         }, 200);
