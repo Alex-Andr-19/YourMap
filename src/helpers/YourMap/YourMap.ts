@@ -14,6 +14,7 @@ import type {
     LayersNamesType,
     LayersObjType,
     YourMapBaseOptions,
+    YourMapLayerStyleType,
     YourMapOptions,
     YourMapOptionsMultyLayers,
 } from "./types";
@@ -145,8 +146,8 @@ export class YourMap {
      **              interfaces.style                **
      * ============================================= */
 
-    setStyles(styleFunction: StyleFunction, layerName: LayersNamesType = "main") {
-        this.layers[layerName]?.setStyles(styleFunction);
+    setStyles(options: YourMapLayerStyleType, layerName: LayersNamesType = "main") {
+        this.layers[layerName]?.setStyles(options);
     }
 
     /** ===============================================

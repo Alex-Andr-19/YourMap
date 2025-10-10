@@ -99,11 +99,14 @@ function createMap2() {
     map_2 = new YourMap({
         target: "map2",
         darkTheme: false,
-        isClustering: false,
+        // isClustering: false,
         interactionHandler: (features) => {
             console.log("Here!!!", features);
         },
     });
+    // map_2.setStyles({
+    //     point: localStyleFunction1,
+    // });
     map_2.setStyles(localStyleFunction1);
     getData().then((res) => {
         map_2.setData(res);

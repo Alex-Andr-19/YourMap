@@ -1,4 +1,3 @@
-import type { StyleFunction, StyleLike } from "ol/style/Style";
 import type {
     FeatureStringType,
     FeatureStyleFullOptionType,
@@ -12,6 +11,7 @@ import type { FeatureLike } from "ol/Feature";
 import type Style from "ol/style/Style";
 import { YourMap } from "./YourMap";
 import { clone } from "../deepClone";
+import type { StyleLike } from "ol/style/Style";
 
 export class YourMapStyling {
     layer: LayersType;
@@ -21,10 +21,10 @@ export class YourMapStyling {
         this.layer = _options.layer;
         this.layerStyle = clone(this.configureStylingOptions(_options.layerStyle));
 
-        this.setStyles(this.styleFunction.bind(this));
+        this.applyStyles(this.styleFunction.bind(this));
     }
 
-    configureStylingOptions(options: YourMapLayerStyleType): FeatureStyleFullOptionType {
+    private configureStylingOptions(options: YourMapLayerStyleType): FeatureStyleFullOptionType {
         const res = DEFAULT_STYLES_2;
 
         if (options instanceof Function) {
@@ -50,13 +50,35 @@ export class YourMapStyling {
         return res;
     }
 
-    styleFunction(feature: FeatureLike, resolution: number): Style {
+    private styleFunction(feature: FeatureLike, resolution: number): Style {
         const featureType = YourMap.getTypeOfFeature(feature);
 
         return this.layerStyle[featureType || "point"].plain(feature, resolution) as Style;
     }
 
-    setStyles(styleFunction: StyleLike) {
+    private applyStyles(styleFunction: StyleLike) {
         this.layer.setStyle(styleFunction);
+    }
+
+    setStyles(options: YourMapLayerStyleType) {
+        if (options instanceof Function) {
+            this.layerStyle.point.plain = options;
+            this.layerStyle.cluster.plain = options;
+        } else if (options instanceof Object) {
+            let key: FeatureStringType;
+            for (key in options) {
+                const valueOfStyle = options[key];
+                if (valueOfStyle instanceof Function) {
+                    this.layerStyle[key].plain = valueOfStyle;
+                } else {
+                    const _valueOfStyle = valueOfStyle as FeatureStyleType;
+                    let styleType: keyof FeatureStyleType;
+                    for (styleType in DEFAULT_STYLES_2.point) {
+                        if (styleType in _valueOfStyle)
+                            this.layerStyle[key][styleType] = _valueOfStyle[styleType];
+                    }
+                }
+            }
+        }
     }
 }

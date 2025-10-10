@@ -6,7 +6,7 @@ import { YourMapInteraction } from "./YourMapInteraction";
 import VectorSource from "ol/source/Vector";
 import { DEFAULT_LAYER_OPTIONS } from "./MapConstants";
 import type { StyleFunction } from "ol/style/Style";
-import type { LayersType, YourMapLayerOptionsType } from "./types";
+import type { LayersType, YourMapLayerOptionsType, YourMapLayerStyleType } from "./types";
 import { clone } from "../deepClone";
 
 export class YourMapLayer {
@@ -55,8 +55,8 @@ export class YourMapLayer {
         this.data.addData(data);
     }
 
-    setStyles(styleFunction: StyleFunction) {
-        this.style.setStyles(styleFunction);
+    setStyles(options: YourMapLayerStyleType) {
+        this.style.setStyles(options);
     }
 
     bindInteractionToMap() {
