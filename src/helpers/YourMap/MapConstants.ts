@@ -11,7 +11,7 @@ import type {
     YourMapLayerOptionsType,
 } from "./types";
 
-export const DEFAULT_POINT_STYLES: StyleFunction = (feature: FeatureLike) => {
+export const DEFAULT_POINT_STYLES: StyleFunction = (feature: FeatureLike, resolution: number) => {
     return new Style({
         image: new CircleStyle({
             radius: 10,
@@ -35,7 +35,10 @@ export const DEFAULT_POINT_STYLES: StyleFunction = (feature: FeatureLike) => {
     });
 };
 
-export const DEFAULT_SELECTED_POINT_STYLES: StyleFunction = (feature: FeatureLike) => {
+export const DEFAULT_SELECTED_POINT_STYLES: StyleFunction = (
+    feature: FeatureLike,
+    resolution: number,
+) => {
     return new Style({
         image: new CircleStyle({
             radius: 10,
@@ -59,14 +62,19 @@ export const DEFAULT_SELECTED_POINT_STYLES: StyleFunction = (feature: FeatureLik
     });
 };
 
+export const BASE_STYLE_FUNCTION: StyleFunction = (feature: FeatureLike, resolution: number) => {
+    if (feature.get("selected") !== true) return DEFAULT_POINT_STYLES(feature, resolution);
+    else return DEFAULT_SELECTED_POINT_STYLES(feature, resolution);
+};
+
 export const DEFAULT_STYLES_2: FeatureStyleFullOptionType = {
     point: {
-        plain: DEFAULT_POINT_STYLES,
-        selected: DEFAULT_SELECTED_POINT_STYLES,
+        plain: BASE_STYLE_FUNCTION,
+        selected: BASE_STYLE_FUNCTION,
     },
     cluster: {
-        plain: DEFAULT_POINT_STYLES,
-        selected: DEFAULT_SELECTED_POINT_STYLES,
+        plain: BASE_STYLE_FUNCTION,
+        selected: BASE_STYLE_FUNCTION,
     },
 };
 
@@ -81,4 +89,5 @@ export const DEFAULT_LAYER_OPTIONS: Required<Omit<YourMapLayerOptionsType, "data
     interactionHandler: (features) => {
         console.log("Default handler:", features);
     },
+    name: "main",
 };

@@ -9,10 +9,10 @@ import Style, { type StyleFunction } from "ol/style/Style";
 import Text from "ol/style/Text";
 import type { FeatureLike } from "ol/Feature";
 
-function getData(): Promise<GeoJSON.FeatureCollection> {
+function getData(countOfData: number = 200): Promise<GeoJSON.FeatureCollection> {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            resolve(generateGeoJSON(200));
+            resolve(generateGeoJSON(countOfData));
         }, 1000);
     });
 }

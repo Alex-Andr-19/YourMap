@@ -12,6 +12,7 @@ import type Style from "ol/style/Style";
 import { YourMap } from "./YourMap";
 import { clone } from "../deepClone";
 import type { StyleLike } from "ol/style/Style";
+import type Feature from "ol/Feature";
 
 export class YourMapStyling {
     layer: LayersType;
@@ -22,6 +23,8 @@ export class YourMapStyling {
         this.layerStyle = clone(this.configureStylingOptions(_options.layerStyle));
 
         this.applyStyles(this.styleFunction.bind(this));
+
+        // console.log(this.layerStyle);
     }
 
     private configureStylingOptions(options: YourMapLayerStyleType): FeatureStyleFullOptionType {
@@ -52,8 +55,16 @@ export class YourMapStyling {
 
     private styleFunction(feature: FeatureLike, resolution: number): Style {
         const featureType = YourMap.getTypeOfFeature(feature);
+        let isFeatureSelected = feature.get("selected") === true;
+        const features = feature.get("features") as Feature[];
+        if (features !== undefined) {
+            isFeatureSelected =
+                features.map((el) => !!el.get("selected")).reduce((total, x) => (total += +x), 0) >
+                0;
+        }
+        const styleType = isFeatureSelected ? "selected" : "plain";
 
-        return this.layerStyle[featureType || "point"].plain(feature, resolution) as Style;
+        return this.layerStyle[featureType][styleType](feature, resolution) as Style;
     }
 
     private applyStyles(styleFunction: StyleLike) {

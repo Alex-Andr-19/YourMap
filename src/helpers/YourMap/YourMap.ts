@@ -48,6 +48,8 @@ export class YourMap {
                 zoom: this.zoom,
             }),
         });
+
+        for (let layerKey in this.layers) this.layers[layerKey]!.bindMap();
     }
 
     private configureOptions(_options: YourMapOptions) {
@@ -80,6 +82,7 @@ export class YourMap {
         for (let key in options.layers) {
             this.layers[key] = new YourMapLayer({
                 ...options.layers[key],
+                name: key,
             });
         }
     }
@@ -146,22 +149,16 @@ export class YourMap {
      **          interfaces.interactions             **
      * ============================================= */
 
-    isFeatureSelected(feature: Feature, layerName: LayersNamesType = "main") {
-        this.layers[layerName]?.isFeatureSelected(feature);
-    }
-
     /** ===============================================
      **               Static methods                 **
      * ============================================= */
 
-    static getTypeOfFeature(feature: FeatureLike): FeatureStringType | null {
-        let res: FeatureStringType | null = null;
+    static getTypeOfFeature(feature: FeatureLike): FeatureStringType {
+        let res: FeatureStringType = "point";
 
         if (feature.getGeometry() instanceof Point) {
-            if (feature.get("features")?.length !== undefined) {
-                if (feature.get("features")?.length < 2) res = "point";
-                else res = "cluster";
-            } else res = "point";
+            const features = feature.get("features");
+            if (features?.length !== undefined && features?.length >= 2) res = "cluster";
         }
 
         return res;
