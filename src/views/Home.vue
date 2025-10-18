@@ -9,6 +9,39 @@ import Style, { type StyleFunction } from "ol/style/Style";
 import Text from "ol/style/Text";
 import type { FeatureLike } from "ol/Feature";
 
+const baseStyle1 = {
+    image: new CircleStyle({
+        radius: 10,
+        stroke: new Stroke({
+            color: "#ff0",
+        }),
+        fill: new Fill({
+            color: "#339900",
+        }),
+    }),
+};
+
+const baseStyle2 = {
+    image: new CircleStyle({
+        radius: 10,
+        stroke: new Stroke({
+            color: "#ff0",
+        }),
+        fill: new Fill({
+            color: "#f00",
+        }),
+    }),
+};
+
+const baseClusterTextStyle = (feature: FeatureLike) => ({
+    text: new Text({
+        text: feature.get("features").length.toString(),
+        fill: new Fill({
+            color: "#fff",
+        }),
+    }),
+});
+
 function getData(countOfData: number = 200): Promise<GeoJSON.FeatureCollection> {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
@@ -17,51 +50,24 @@ function getData(countOfData: number = 200): Promise<GeoJSON.FeatureCollection> 
     });
 }
 
-const localStyleFunction1: StyleFunction = (feature: FeatureLike) => {
+const localStyleFunctionPoint1: StyleFunction = (feature: FeatureLike) => {
+    return new Style(baseStyle1);
+};
+
+const localStyleFunctionCluster1: StyleFunction = (feature: FeatureLike) => {
     return new Style({
-        image: new CircleStyle({
-            radius: 10,
-            stroke: new Stroke({
-                color: "#ff0",
-            }),
-            fill: new Fill({
-                color: "#339900",
-            }),
-        }),
-        ...(YourMap.getTypeOfFeature(feature) === "cluster"
-            ? {
-                  text: new Text({
-                      text: feature.get("features").length.toString(),
-                      fill: new Fill({
-                          color: "#fff",
-                      }),
-                  }),
-              }
-            : {}),
+        ...baseStyle1,
+        ...baseClusterTextStyle(feature),
     });
 };
 
-const localStyleFunction2: StyleFunction = (feature: FeatureLike) => {
+const localStyleFunctionPoint2: StyleFunction = (feature: FeatureLike) => {
+    return new Style(baseStyle2);
+};
+const localStyleFunctionCluster2: StyleFunction = (feature: FeatureLike) => {
     return new Style({
-        image: new CircleStyle({
-            radius: 10,
-            stroke: new Stroke({
-                color: "#ff0",
-            }),
-            fill: new Fill({
-                color: "#f00",
-            }),
-        }),
-        ...(YourMap.getTypeOfFeature(feature) === "cluster"
-            ? {
-                  text: new Text({
-                      text: feature.get("features").length.toString(),
-                      fill: new Fill({
-                          color: "#fff",
-                      }),
-                  }),
-              }
-            : {}),
+        ...baseStyle2,
+        ...baseClusterTextStyle(feature),
     });
 };
 
@@ -75,14 +81,14 @@ async function createMap1() {
                 interactionHandler: (features) => {
                     console.log("Hallo, world!!!", features);
                 },
-                style: localStyleFunction1,
+                style: localStyleFunctionPoint1,
             },
             second: {
                 isClustering: false,
                 style: {
                     point: {
-                        plain: localStyleFunction2,
-                        selected: localStyleFunction1,
+                        plain: localStyleFunctionPoint2,
+                        selected: localStyleFunctionCluster1,
                     },
                 },
             },
@@ -104,7 +110,7 @@ function createMap2() {
             console.log("Here!!!", features);
         },
     });
-    map_2.setStyles(localStyleFunction1);
+    map_2.setStyles(localStyleFunctionPoint1);
     getData().then((res) => {
         map_2.setData(res);
     });
