@@ -5,17 +5,38 @@ import type { Feature } from "ol";
 import type VectorSource from "ol/source/Vector";
 import type { LayersType } from "./types";
 
+/**
+ * Класс для обработки данных GeoJSON в слое карты
+ *
+ * Обеспечивает:
+ * - Загрузку и отображение GeoJSON данных
+ * - Работу с кластеризованными и обычными слоями
+ * - Добавление, очистку и обновление данных
+ */
 export class YourMapDataProcessing {
+    /** Слой карты */
     layer: LayersType;
+
+    /** Источник данных слоя */
     layerSource: VectorSource | null;
+
+    /** Является ли слой кластеризованным */
     isCluster: boolean;
 
+    /**
+     * Создает обработчик данных для слоя
+     * @param layer - слой карты
+     */
     constructor(layer: LayersType) {
         this.layer = layer;
         this.isCluster = this.layer.getSource() instanceof Cluster;
         this.layerSource = this.getFeaturesSource();
     }
 
+    /**
+     * Получает источник данных слоя (для кластеризованных слоев - внутренний источник)
+     * @returns источник данных
+     */
     getFeaturesSource() {
         const layerSource = this.layer.getSource();
         let res = layerSource;
@@ -29,7 +50,10 @@ export class YourMapDataProcessing {
         return res;
     }
 
-    // Метод для установки/обновления данных
+    /**
+     * Устанавливает данные для слоя (заменяет существующие)
+     * @param data - GeoJSON данные
+     */
     setData(data: GeoJSON.FeatureCollection) {
         const format = new GeoJSON();
         const features = format.readFeatures(data);
@@ -40,14 +64,19 @@ export class YourMapDataProcessing {
         }
     }
 
-    // Дополнительные методы для работы с данными
+    /**
+     * Очищает все данные слоя
+     */
     clearData() {
         if (this.layerSource) {
             this.layerSource.clear();
         }
     }
 
-    // Метод для добавления данных без очистки существующих
+    /**
+     * Добавляет данные к существующим в слое
+     * @param data - GeoJSON данные
+     */
     addData(data: GeoJSON.FeatureCollection) {
         const format = new GeoJSON();
         const features = format.readFeatures(data);

@@ -14,10 +14,25 @@ import { clone } from "../deepClone";
 import type { StyleLike } from "ol/style/Style";
 import type Feature from "ol/Feature";
 
+/**
+ * Класс для управления стилями объектов на карте
+ *
+ * Обеспечивает:
+ * - Настройку стилей для точек и кластеров
+ * - Поддержку состояний (обычное/выделенное)
+ * - Применение стилей к слою
+ */
 export class YourMapStyling {
+    /** Слой карты */
     layer: LayersType;
+
+    /** Полные стили для всех типов объектов */
     layerStyle: FeatureStyleFullOptionType;
 
+    /**
+     * Создает обработчик стилей для слоя
+     * @param _options - опции стилизации
+     */
     constructor(_options: YourMapStylingOptionsType) {
         this.layer = _options.layer;
         this.layerStyle = clone(this.configureStylingOptions(_options.layerStyle));
@@ -25,6 +40,12 @@ export class YourMapStyling {
         this.applyStyles(this.styleFunction.bind(this));
     }
 
+    /**
+     * Настраивает опции стилизации, объединяя пользовательские стили с дефолтными
+     * @private
+     * @param options - пользовательские стили
+     * @returns полные стили для всех типов объектов
+     */
     private configureStylingOptions(options: YourMapLayerStyleType): FeatureStyleFullOptionType {
         const res = DEFAULT_STYLES_2;
 
@@ -51,6 +72,13 @@ export class YourMapStyling {
         return res;
     }
 
+    /**
+     * Функция стилизации объектов на основе их типа и состояния
+     * @private
+     * @param feature - объект OpenLayers
+     * @param resolution - разрешение карты
+     * @returns стиль объекта
+     */
     private styleFunction(feature: FeatureLike, resolution: number): Style {
         const featureType = YourMap.getTypeOfFeature(feature);
         let isFeatureSelected = feature.get("selected") === true;
@@ -65,10 +93,19 @@ export class YourMapStyling {
         return this.layerStyle[featureType][styleType](feature, resolution) as Style;
     }
 
+    /**
+     * Применяет функцию стилизации к слою
+     * @private
+     * @param styleFunction - функция стилизации
+     */
     private applyStyles(styleFunction: StyleLike) {
         this.layer.setStyle(styleFunction);
     }
 
+    /**
+     * Устанавливает новые стили для слоя
+     * @param options - стили для объектов
+     */
     setStyles(options: YourMapLayerStyleType) {
         if (options instanceof Function) {
             this.layerStyle.point.plain = options;

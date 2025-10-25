@@ -20,18 +20,59 @@ import type {
 import { Point } from "ol/geom";
 
 useGeographic();
+
+/**
+ * Основной класс библиотеки YourMap для работы с интерактивными картами
+ *
+ * Предоставляет упрощенный API для работы с OpenLayers, включая:
+ * - Создание карт с базовым слоем OSM
+ * - Управление множественными слоями
+ * - Кластеризацию точек
+ * - Кастомные стили для объектов
+ * - Обработку взаимодействий (клики, выделение)
+ * - Темную тему
+ *
+ * @example
+ * ```typescript
+ * // Простая карта с одним слоем
+ * const map = new YourMap({
+ *   target: 'map',
+ *   data: geoJsonData,
+ *   interactionHandler: (features) => console.log(features)
+ * });
+ *
+ * // Карта с несколькими слоями
+ * const map = new YourMap({
+ *   target: 'map',
+ *   layers: {
+ *     points: { data: pointsData, isClustering: true },
+ *     lines: { data: linesData, isClustering: false }
+ *   }
+ * });
+ * ```
+ */
 export class YourMap {
+    /** Базовый слой карты (OSM) */
     private baseLayer = new TileLayer({
         source: new OSM(),
     });
 
+    /** Объект со всеми слоями карты */
     private layers: LayersObjType = {};
 
+    /** Экземпляр карты OpenLayers */
     olMap: Map | null;
 
+    /** Центр карты по умолчанию [долгота, широта] */
     private center: CoordinateType = [44.002, 56.3287];
+
+    /** Масштаб карты по умолчанию */
     private zoom: number = 11;
 
+    /**
+     * Создает новый экземпляр карты YourMap
+     * @param _options - опции конфигурации карты
+     */
     constructor(_options?: YourMapOptions) {
         const options = this.configureOptions({ ...DEFAULT_MAP_OPTIONS, ..._options });
 
@@ -51,6 +92,12 @@ export class YourMap {
         for (let layerKey in this.layers) this.layers[layerKey]!.bindMap();
     }
 
+    /**
+     * Настраивает опции карты, разделяя базовые опции и опции слоев
+     * @private
+     * @param _options - исходные опции
+     * @returns настроенные опции для множественных слоев
+     */
     private configureOptions(_options: YourMapOptions) {
         const baseMapOption: YourMapBaseOptions = {};
         const layersOptions = clone(_options);
@@ -77,6 +124,11 @@ export class YourMap {
         return res;
     }
 
+    /**
+     * Создает слои карты на основе опций
+     * @private
+     * @param options - опции с настройками слоев
+     */
     private generateLayers(options: YourMapOptionsMultyLayers) {
         for (let key in options.layers) {
             this.layers[key] = new YourMapLayer({
@@ -86,6 +138,10 @@ export class YourMap {
         }
     }
 
+    /**
+     * Включает темную тему для базового слоя карты
+     * @private
+     */
     private enambleDarkTheme() {
         this.baseLayer.on("prerender", (evt) => {
             if (evt.context) {
@@ -112,11 +168,20 @@ export class YourMap {
      **              Work with layers                **
      * ============================================= */
 
+    /**
+     * Возвращает все слои карты
+     * @returns объект со всеми слоями
+     */
     getLayers() {
         return this.layers;
     }
 
-    getLayer(layerName: string): LayersObjType[string] | undefined {
+    /**
+     * Возвращает конкретный слой по имени
+     * @param layerName - имя слоя
+     * @returns слой карты или undefined
+     */
+    getLayer(layerName: string = "main"): LayersObjType[string] | undefined {
         return this.layers[layerName];
     }
 
@@ -124,14 +189,28 @@ export class YourMap {
      **               interfaces.data                **
      * ============================================= */
 
+    /**
+     * Устанавливает данные для слоя (заменяет существующие)
+     * @param data - GeoJSON данные
+     * @param layerName - имя слоя (по умолчанию "main")
+     */
     setData(data: GeoJSON.FeatureCollection, layerName: LayersNamesType = "main") {
         this.layers[layerName]?.setData(data);
     }
 
+    /**
+     * Очищает данные слоя
+     * @param layerName - имя слоя (по умолчанию "main")
+     */
     clearData(layerName: LayersNamesType = "main") {
         this.layers[layerName]?.clearData();
     }
 
+    /**
+     * Добавляет данные к существующим в слое
+     * @param data - GeoJSON данные
+     * @param layerName - имя слоя (по умолчанию "main")
+     */
     addData(data: GeoJSON.FeatureCollection, layerName: LayersNamesType = "main") {
         this.layers[layerName]?.addData(data);
     }
@@ -140,6 +219,11 @@ export class YourMap {
      **              interfaces.style                **
      * ============================================= */
 
+    /**
+     * Устанавливает стили для слоя
+     * @param options - стили для объектов слоя
+     * @param layerName - имя слоя (по умолчанию "main")
+     */
     setStyles(options: YourMapLayerStyleType, layerName: LayersNamesType = "main") {
         this.layers[layerName]?.setStyles(options);
     }
@@ -152,6 +236,11 @@ export class YourMap {
      **               Static methods                 **
      * ============================================= */
 
+    /**
+     * Определяет тип геометрического объекта
+     * @param feature - объект OpenLayers
+     * @returns тип объекта ("point" или "cluster")
+     */
     static getTypeOfFeature(feature: FeatureLike): FeatureStringType {
         let res: FeatureStringType = "point";
 

@@ -12,18 +12,45 @@ import type {
 } from "./types";
 import type { Feature, Map } from "ol";
 
+/**
+ * Класс для управления отдельным слоем карты
+ *
+ * Обеспечивает:
+ * - Создание и настройку слоя OpenLayers
+ * - Обработку данных GeoJSON
+ * - Управление стилями объектов
+ * - Обработку взаимодействий (клики, выделение)
+ * - Поддержку кластеризации
+ */
 export class YourMapLayer {
+    /** Слой OpenLayers */
     olLayer: LayersType;
+
+    /** Имя слоя */
     name: string = "main";
 
+    /** Обработчик данных слоя */
     private data: YourMapDataProcessing;
+
+    /** Обработчик стилей слоя */
     private style: YourMapStyling;
+
+    /** Экземпляр карты OpenLayers */
     private olMap: Map | null = null;
+
+    /** Включена ли кластеризация */
     private isClustering: boolean = true;
 
+    /** Обработчик взаимодействий */
     private interactionHandler: InteractionFunctionType;
+
+    /** Массив выделенных объектов */
     private selectedFeatures: Feature[] = [];
 
+    /**
+     * Создает новый слой карты
+     * @param _options - опции конфигурации слоя
+     */
     constructor(_options: YourMapLayerOptionsType) {
         const options = { ...DEFAULT_LAYER_OPTIONS, ..._options };
         this.name = options.name;
@@ -47,12 +74,19 @@ export class YourMapLayer {
         if (options.data) this.data.addData(options.data);
     }
 
+    /**
+     * Привязывает слой к карте и настраивает взаимодействия
+     */
     bindMap() {
         this.olMap = this.olLayer.getMapInternal();
 
         this.bindInteractions();
     }
 
+    /**
+     * Настраивает обработчики взаимодействий (клики, выделение)
+     * @private
+     */
     private bindInteractions() {
         this.olMap!.on("click", (ev) => {
             const clickedFeature = this.olMap!.getFeaturesAtPixel(ev.pixel)[0] as Feature;
@@ -89,18 +123,33 @@ export class YourMapLayer {
         });
     }
 
+    /**
+     * Устанавливает данные для слоя (заменяет существующие)
+     * @param data - GeoJSON данные
+     */
     setData(data: GeoJSON.FeatureCollection) {
         this.data.setData(data);
     }
 
+    /**
+     * Очищает данные слоя
+     */
     clearData() {
         this.data.clearData();
     }
 
+    /**
+     * Добавляет данные к существующим в слое
+     * @param data - GeoJSON данные
+     */
     addData(data: GeoJSON.FeatureCollection) {
         this.data.addData(data);
     }
 
+    /**
+     * Устанавливает стили для объектов слоя
+     * @param options - стили для объектов
+     */
     setStyles(options: YourMapLayerStyleType) {
         this.style.setStyles(options);
     }
