@@ -23,8 +23,6 @@ export class YourMapStyling {
         this.layerStyle = clone(this.configureStylingOptions(_options.layerStyle));
 
         this.applyStyles(this.styleFunction.bind(this));
-
-        // console.log(this.layerStyle);
     }
 
     private configureStylingOptions(options: YourMapLayerStyleType): FeatureStyleFullOptionType {

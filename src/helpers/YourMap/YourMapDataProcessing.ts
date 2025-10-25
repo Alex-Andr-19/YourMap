@@ -2,8 +2,8 @@ import GeoJSON from "ol/format/GeoJSON";
 import type VectorLayer from "ol/layer/Vector";
 import { Cluster } from "ol/source";
 import type { Feature } from "ol";
-import type { LayersType } from "./YourMap";
 import type VectorSource from "ol/source/Vector";
+import type { LayersType } from "./types";
 
 export class YourMapDataProcessing {
     layer: LayersType;

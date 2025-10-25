@@ -18,7 +18,6 @@ import type {
     YourMapOptionsMultyLayers,
 } from "./types";
 import { Point } from "ol/geom";
-import type Feature from "ol/Feature";
 
 useGeographic();
 export class YourMap {
