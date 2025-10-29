@@ -3,7 +3,7 @@ import type VectorLayer from "ol/layer/Vector";
 import { Cluster } from "ol/source";
 import type { Feature } from "ol";
 import type VectorSource from "ol/source/Vector";
-import type { LayersType } from "./types";
+import type { LayersType } from "./index.d.ts";
 
 /**
  * Класс для обработки данных GeoJSON в слое карты

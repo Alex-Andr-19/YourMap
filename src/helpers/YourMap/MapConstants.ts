@@ -7,9 +7,20 @@ import type { FeatureLike } from "ol/Feature";
 import { YourMap } from "./YourMap";
 import type {
     FeatureStyleFullOptionType,
+    InteractionFunctionType,
     YourMapBaseOptions,
+    YourMapInteractionsOptionsType,
     YourMapLayerOptionsType,
-} from "./types";
+} from "./index.d.ts";
+
+export const DEFAULT_CLUSTER_TEXT_STYLE = (feature: FeatureLike) => ({
+    text: new Text({
+        text: feature.get("features").length.toString(),
+        fill: new Fill({
+            color: "#fff",
+        }),
+    }),
+});
 
 export const DEFAULT_POINT_STYLES: StyleFunction = (feature: FeatureLike, resolution: number) => {
     return new Style({
@@ -19,18 +30,11 @@ export const DEFAULT_POINT_STYLES: StyleFunction = (feature: FeatureLike, resolu
                 color: "#fff",
             }),
             fill: new Fill({
-                color: "#77A",
+                color: "#558",
             }),
         }),
         ...(YourMap.getTypeOfFeature(feature) === "cluster"
-            ? {
-                  text: new Text({
-                      text: feature.get("features").length.toString(),
-                      fill: new Fill({
-                          color: "#fff",
-                      }),
-                  }),
-              }
+            ? DEFAULT_CLUSTER_TEXT_STYLE(feature)
             : {}),
     });
 };
@@ -50,16 +54,16 @@ export const DEFAULT_SELECTED_POINT_STYLES: StyleFunction = (
             }),
         }),
         ...(YourMap.getTypeOfFeature(feature) === "cluster"
-            ? {
-                  text: new Text({
-                      text: feature.get("features").length.toString(),
-                      fill: new Fill({
-                          color: "#fff",
-                      }),
-                  }),
-              }
+            ? DEFAULT_CLUSTER_TEXT_STYLE(feature)
             : {}),
     });
+};
+
+export const DEFAULT_MAP_INTERACTION: Omit<YourMapInteractionsOptionsType, "layer"> = {
+    interactionHandler: (features) => {
+        console.log("Default handler:", features);
+    },
+    isClustering: true,
 };
 
 export const BASE_STYLE_FUNCTION: StyleFunction = (feature: FeatureLike, resolution: number) => {
@@ -67,7 +71,7 @@ export const BASE_STYLE_FUNCTION: StyleFunction = (feature: FeatureLike, resolut
     else return DEFAULT_SELECTED_POINT_STYLES(feature, resolution);
 };
 
-export const DEFAULT_STYLES_2: FeatureStyleFullOptionType = {
+export const DEFAULT_STYLES: FeatureStyleFullOptionType = {
     point: {
         plain: BASE_STYLE_FUNCTION,
         selected: BASE_STYLE_FUNCTION,
@@ -86,8 +90,6 @@ export const DEFAULT_MAP_OPTIONS: Required<YourMapBaseOptions> = {
 export const DEFAULT_LAYER_OPTIONS: Required<Omit<YourMapLayerOptionsType, "data">> = {
     isClustering: true,
     style: DEFAULT_POINT_STYLES,
-    interactionHandler: (features) => {
-        console.log("Default handler:", features);
-    },
+    interactionHandler: DEFAULT_MAP_INTERACTION.interactionHandler,
     name: "main",
 };

@@ -16,7 +16,7 @@ import type {
     YourMapLayerStyleType,
     YourMapOptions,
     YourMapOptionsMultyLayers,
-} from "./types";
+} from "./index.d.ts";
 import { Point } from "ol/geom";
 
 useGeographic();

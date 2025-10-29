@@ -88,7 +88,7 @@ async function createMap1() {
                 style: {
                     point: {
                         plain: localStyleFunctionPoint2,
-                        selected: localStyleFunctionCluster1,
+                        selected: localStyleFunctionPoint1,
                     },
                 },
             },

@@ -9,8 +9,9 @@ import type {
     LayersType,
     YourMapLayerOptionsType,
     YourMapLayerStyleType,
-} from "./types";
+} from "./index.d.ts";
 import type { Feature, Map } from "ol";
+import { YourMapInteraction } from "./YourMapInteraction.ts";
 
 /**
  * Класс для управления отдельным слоем карты
@@ -47,6 +48,8 @@ export class YourMapLayer {
     /** Массив выделенных объектов */
     private selectedFeatures: Feature[] = [];
 
+    private interaction: YourMapInteraction;
+
     /**
      * Создает новый слой карты
      * @param _options - опции конфигурации слоя
@@ -71,6 +74,12 @@ export class YourMapLayer {
             layer: this.olLayer,
             layerStyle: options.style,
         });
+        // console.log(this.style);
+        this.interaction = new YourMapInteraction({
+            layer: this.olLayer,
+            interactionHandler: options.interactionHandler,
+            isClustering: this.isClustering,
+        });
         if (options.data) this.data.addData(options.data);
     }
 
@@ -78,50 +87,50 @@ export class YourMapLayer {
      * Привязывает слой к карте и настраивает взаимодействия
      */
     bindMap() {
-        this.olMap = this.olLayer.getMapInternal();
+        this.olMap = this.olLayer.getMapInternal()!;
 
-        this.bindInteractions();
+        this.interaction.bindInteractions(this.olMap);
     }
 
     /**
      * Настраивает обработчики взаимодействий (клики, выделение)
      * @private
      */
-    private bindInteractions() {
-        this.olMap!.on("click", (ev) => {
-            const clickedFeature = this.olMap!.getFeaturesAtPixel(ev.pixel)[0] as Feature;
-            const eventOfTheSameLayer = this.olLayer
-                .getSource()!
-                .getFeatures()
-                .some((feature: Feature) => feature === clickedFeature);
+    // private bindInteractions() {
+    //     this.olMap!.on("click", (ev) => {
+    //         const clickedFeature = this.olMap!.getFeaturesAtPixel(ev.pixel)[0] as Feature;
+    //         const eventOfTheSameLayer = this.olLayer
+    //             .getSource()!
+    //             .getFeatures()
+    //             .some((feature: Feature) => feature === clickedFeature);
 
-            if (clickedFeature !== undefined && eventOfTheSameLayer) {
-                let selectedFeatures = [clickedFeature];
-                if (this.isClustering)
-                    selectedFeatures = clickedFeature.get("features") as Feature[];
+    //         if (clickedFeature !== undefined && eventOfTheSameLayer) {
+    //             let selectedFeatures = [clickedFeature];
+    //             if (this.isClustering)
+    //                 selectedFeatures = clickedFeature.get("features") as Feature[];
 
-                if (this.selectedFeatures.length > 0)
-                    this.selectedFeatures.forEach((feature: Feature) => {
-                        feature.set("selected", false);
-                    });
-                this.selectedFeatures = selectedFeatures;
+    //             if (this.selectedFeatures.length > 0)
+    //                 this.selectedFeatures.forEach((feature: Feature) => {
+    //                     feature.set("selected", false);
+    //                 });
+    //             this.selectedFeatures = selectedFeatures;
 
-                this.selectedFeatures.forEach((feature: Feature) => {
-                    feature.set("selected", true);
-                });
+    //             this.selectedFeatures.forEach((feature: Feature) => {
+    //                 feature.set("selected", true);
+    //             });
 
-                this.interactionHandler(this.selectedFeatures);
-            } else if (this.selectedFeatures.length > 0) {
-                this.selectedFeatures.forEach((feature: Feature) => {
-                    feature.set("selected", false);
-                });
-                this.selectedFeatures = [];
-                console.log("Layer name", this.name, "– missClick");
-            }
+    //             this.interactionHandler(this.selectedFeatures);
+    //         } else if (this.selectedFeatures.length > 0) {
+    //             this.selectedFeatures.forEach((feature: Feature) => {
+    //                 feature.set("selected", false);
+    //             });
+    //             this.selectedFeatures = [];
+    //             console.log("Layer name", this.name, "– missClick");
+    //         }
 
-            this.olLayer.changed();
-        });
-    }
+    //         this.olLayer.changed();
+    //     });
+    // }
 
     /**
      * Устанавливает данные для слоя (заменяет существующие)

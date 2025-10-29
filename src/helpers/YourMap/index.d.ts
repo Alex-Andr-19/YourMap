@@ -90,8 +90,10 @@ export type InteractionFunctionType = (features: ReturnType<Feature["getProperti
 export interface YourMapInteractionsOptionsType {
     /** Слой карты для обработки взаимодействий */
     layer: LayersType;
-    /** Стили для различных состояний объектов */
-    styles: FeatureStyleFullOptionType;
+    /** Обработчик кликов по объектам */
+    interactionHandler: InteractionFunctionType;
+    /** Кластеризуются ли точки */
+    isClustering: boolean;
 }
 
 // ============================================================================

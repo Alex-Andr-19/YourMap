@@ -5,8 +5,8 @@ import type {
     LayersType,
     YourMapLayerStyleType,
     YourMapStylingOptionsType,
-} from "./types";
-import { DEFAULT_STYLES_2 } from "./MapConstants";
+} from "./index.d.ts";
+import { DEFAULT_CLUSTER_TEXT_STYLE, DEFAULT_STYLES } from "./MapConstants";
 import type { FeatureLike } from "ol/Feature";
 import type Style from "ol/style/Style";
 import { YourMap } from "./YourMap";
@@ -47,11 +47,18 @@ export class YourMapStyling {
      * @returns полные стили для всех типов объектов
      */
     private configureStylingOptions(options: YourMapLayerStyleType): FeatureStyleFullOptionType {
-        const res = DEFAULT_STYLES_2;
+        const res = DEFAULT_STYLES;
 
         if (options instanceof Function) {
             res.point.plain = options;
-            res.cluster.plain = options;
+            res.cluster.plain = (feature: FeatureLike, resolution: number) => {
+                const featureStyle = options(feature, resolution) as Style;
+                if (featureStyle.getText() === null) {
+                    featureStyle.setText(DEFAULT_CLUSTER_TEXT_STYLE(feature).text);
+                }
+
+                return featureStyle;
+            };
         } else if (options instanceof Object) {
             let key: FeatureStringType;
             for (key in options) {
@@ -61,7 +68,7 @@ export class YourMapStyling {
                 } else {
                     const _valueOfStyle = valueOfStyle as FeatureStyleType;
                     let styleType: keyof FeatureStyleType;
-                    for (styleType in DEFAULT_STYLES_2.point) {
+                    for (styleType in DEFAULT_STYLES.point) {
                         if (styleType in _valueOfStyle)
                             res[key][styleType] = _valueOfStyle[styleType];
                     }
@@ -69,6 +76,7 @@ export class YourMapStyling {
             }
         }
 
+        console.log(res);
         return res;
     }
 
@@ -109,7 +117,14 @@ export class YourMapStyling {
     setStyles(options: YourMapLayerStyleType) {
         if (options instanceof Function) {
             this.layerStyle.point.plain = options;
-            this.layerStyle.cluster.plain = options;
+            this.layerStyle.cluster.plain = (feature: FeatureLike, resolution: number) => {
+                const featureStyle = options(feature, resolution) as Style;
+                if (featureStyle.getText() === null) {
+                    featureStyle.setText(DEFAULT_CLUSTER_TEXT_STYLE(feature).text);
+                }
+
+                return featureStyle;
+            };
         } else if (options instanceof Object) {
             let key: FeatureStringType;
             for (key in options) {
@@ -119,7 +134,7 @@ export class YourMapStyling {
                 } else {
                     const _valueOfStyle = valueOfStyle as FeatureStyleType;
                     let styleType: keyof FeatureStyleType;
-                    for (styleType in DEFAULT_STYLES_2.point) {
+                    for (styleType in DEFAULT_STYLES.point) {
                         if (styleType in _valueOfStyle)
                             this.layerStyle[key][styleType] = _valueOfStyle[styleType];
                     }

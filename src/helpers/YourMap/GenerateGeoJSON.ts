@@ -1,4 +1,4 @@
-import type { CoordinateType } from "./types";
+import type { CoordinateType } from "./index.d.ts";
 
 /** Первая точка границы для генерации данных */
 const firstPoint: CoordinateType = [43.84, 56.37];
